@@ -1,12 +1,12 @@
 #!/bin/bash
 
-model_arch=$1
+model=$1
 dataset=$2
 language=$3
 seed=$4
 timestamp=$(date +%s)
 
-MODEL=${model_arch} DATASET=${dataset} LANGUAGE=${language} SEED=${seed}\
-sbatch  --job-name="lm-train-${model_arch}-${language}" \
-        --output="./logs/train_${model_arch}_${language}_${seed}_${timestamp}.out" \
+MODEL=${model} DATASET=${dataset} LANGUAGE=${language} SEED=${seed} \
+sbatch  --job-name="lm-train-${model}-${language}" \
+        --output="./logs/train_${model}_${language}_${seed}_${timestamp}.out" \
         scripts/train.euler
