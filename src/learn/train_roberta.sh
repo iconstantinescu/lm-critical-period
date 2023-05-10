@@ -7,4 +7,6 @@ python ./src/learn/run_mlm.py \
     --do_train \
     --do_eval \
     --output_dir /tmp/test-mlm \
+    --overwrite_output_dir \
+    --fp16 \
     --seed 42
