@@ -1,1 +1,1 @@
-# lm-critical-period
+# Language Models Critical Period
