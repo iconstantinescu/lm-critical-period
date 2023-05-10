@@ -11,11 +11,11 @@
 
 module purge
 module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
-source /cluster/work/cotterell/iconstantine/lm-critical-period/hf_venv/bin/activate
+source /cluster/work/cotterell/iconstantine/lm-critical-period-2/venv/bin/activate
 
 
 #! Full path to application executable:
-application="/cluster/work/cotterell/iconstantine/lm-critical-period/src/learn_hf/train_roberta.sh"
+application="/cluster/work/cotterell/iconstantine/lm-critical-period-2/src/learn/train_roberta.sh"
 source ~/.bashrc
 
 #! Run options for the application:
