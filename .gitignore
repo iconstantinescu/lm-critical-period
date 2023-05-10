@@ -129,8 +129,8 @@ dmypy.json
 .pyre/
 
 # Project specific
-#data/
+data/
 checkpoint/
-#logs/
+logs/
 
 .idea
