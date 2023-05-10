@@ -6,7 +6,7 @@ python ./src/learn/run_mlm.py \
     --per_device_eval_batch_size 8 \
     --do_train \
     --do_eval \
-    --output_dir /tmp/test-mlm \
+    --output_dir ./checkpoints/roberta-mlm \
     --overwrite_output_dir \
     --fp16 \
     --seed 42
