@@ -15,8 +15,23 @@ source /cluster/work/cotterell/iconstantine/lm-critical-period/venv/bin/activate
 
 
 #! Full path to application executable:
-application="/cluster/work/cotterell/iconstantine/lm-critical-period/src/learn/train_roberta.sh"
-source ~/.bashrc
+path="/cluster/work/cotterell/iconstantine/lm-critical-period/src/learn/"
+
+case $MODEL in
+
+  gpt2)
+    application="train_gpt2.sh"
+    ;;
+
+  roberta)
+    application="train_roberta.sh"
+    ;;
+
+  *)
+    echo -n "unknown model name"
+    ;;
+esac
+
 
 #! Run options for the application:
 prefix=""
@@ -26,7 +41,7 @@ options=""
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
                              # in which sbatch is run.
 
-CMD="$prefix $application $options"
+CMD="$prefix $path$application $options"
 
 cd $workdir
 echo -e "Changed directory to `pwd`.\n"
