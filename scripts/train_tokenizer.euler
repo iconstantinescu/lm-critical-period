@@ -19,7 +19,7 @@ path="/cluster/work/cotterell/iconstantine/lm-critical-period/src/learn/"
 application="train_tokenizer.py"
 
 #! Run options for the application:
-prefix=""
+prefix="python3"
 options="${DATASET} ${LANGUAGE}"
 
 #! Work directory (i.e. where the job will run):

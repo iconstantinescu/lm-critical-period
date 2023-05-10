@@ -6,7 +6,7 @@ python ./src/learn/run_clm.py \
     --per_device_eval_batch_size 8 \
     --do_train \
     --do_eval \
-    --output_dir ./checkpoints/gpt2-mlm \
+    --output_dir ./checkpoints/gpt2-clm \
     --overwrite_output_dir \
     --fp16 \
     --seed 42

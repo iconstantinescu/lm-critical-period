@@ -35,7 +35,7 @@ esac
 
 #! Run options for the application:
 prefix=""
-options=""
+options="./data/${DATASET}/${LANGUAGE}/raw ${SEED} "
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
