@@ -16,26 +16,11 @@ source /cluster/work/cotterell/iconstantine/lm-critical-period/venv/bin/activate
 
 #! Full path to application executable:
 path="/cluster/work/cotterell/iconstantine/lm-critical-period/src/learn/"
-
-case $MODEL in
-
-  gpt2)
-    application="train_gpt2.sh"
-    ;;
-
-  roberta)
-    application="train_roberta.sh"
-    ;;
-
-  *)
-    echo -n "unknown model name"
-    ;;
-esac
-
+application="train_tokenizer.py"
 
 #! Run options for the application:
 prefix=""
-options=""
+options="${DATASET} ${LANGUAGE}"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
