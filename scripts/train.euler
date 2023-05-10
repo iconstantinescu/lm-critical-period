@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#SBATCH -n 1
+#SBATCH --cpus-per-task=12
+#SBATCH --mem-per-cpu=16384
+#SBATCH --gpus=6
+#SBATCH --gres=gpumem:11264m
+#SBATCH --time=23:00:00
+#SBATCH --open-mode=truncate
+#SBATCH --mail-type=END,FAIL
+
+module purge
+module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
+source /cluster/work/cotterell/iconstantine/lm-critical-period/hf_venv/bin/activate
+
+
+#! Full path to application executable:
+application="/cluster/work/cotterell/iconstantine/lm-critical-period/src/learn_hf/train_roberta.sh"
+source ~/.bashrc
+
+#! Run options for the application:
+prefix=""
+options=""
+
+#! Work directory (i.e. where the job will run):
+workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
+                             # in which sbatch is run.
+
+CMD="$prefix $application $options"
+
+cd $workdir
+echo -e "Changed directory to `pwd`.\n"
+
+JOBID=$SLURM_JOB_ID
+
+echo -e "JobID: $JOBID\n======"
+echo "Time: `date`"
+echo "Running on master node: `hostname`"
+echo "Current directory: `pwd`"
+
+echo -e "\nExecuting command:\n==================\n$CMD\n"
+
+eval $CMD
+
