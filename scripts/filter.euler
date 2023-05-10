@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#SBATCH -n 1
+#SBATCH --cpus-per-task=40
+#SBATCH --mem-per-cpu=4096
+#SBATCH --time=120:00:00
+#SBATCH --job-name="filter"
+#SBATCH --open-mode=truncate
+#SBATCH --mail-type=END,FAIL
+
+module purge
+module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
+source /cluster/work/cotterell/iconstantine/lm-critical-period/venv/bin/activate
+
+
+#! Full path to application executable:
+application="python /cluster/work/cotterell/iconstantine/lm-critical-period/src/data_processing/filter.py"
+source ~/.bashrc
+
+#! Run options for the application:
+options=" ${DATASET} ${LANGUAGE}"
+
+#! Work directory (i.e. where the job will run):
+workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
+                             # in which sbatch is run.
+
+CMD="$application $options"
+
+cd $workdir
+echo -e "Changed directory to `pwd`.\n"
+
+JOBID=$SLURM_JOB_ID
+
+echo -e "JobID: $JOBID\n======"
+echo "Time: `date`"
+echo "Running on master node: `hostname`"
+echo "Current directory: `pwd`"
+
+echo -e "\nExecuting command:\n==================\n$CMD\n"
+
+eval $CMD
