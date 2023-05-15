@@ -4,9 +4,9 @@ EXTRA_FLAGS=$3
 
 python ./src/learn/run_mlm.py \
     --model_type roberta \
-    --tokenizer_name "${DATA_DIR}/tokenizer-wiki.json" \
-    --train_file "${DATA_DIR}/train.txt" \
-    --validation_file "${DATA_DIR}/validation.txt" \
+    --tokenizer_name ${DATA_DIR} \
+    --train_file "${DATA_DIR}/raw/train.txt" \
+    --validation_file "${DATA_DIR}/raw/validation.txt" \
     --per_device_train_batch_size 8 \
     --per_device_eval_batch_size 8 \
     --do_train \
