@@ -2,12 +2,11 @@ from tokenizers.implementations import ByteLevelBPETokenizer
 from transformers import AutoTokenizer
 
 import argparse
-import json
 
 sample = {
-    "en": "Hello, y'all! How are you 😁 ?",
-    "de": "",
-    "fi": "",
+    "en": "Hello, y'all! How are you 😁? (just testing the tokenizer)",
+    "de": "Dafür lassen Sie mich sorgen.--Der Mann, der mein Gut gekauft hat, wohnt in der Stadt.",
+    "fi": "Hieno, tuskin huomattava hymyily kiertyi Sinikka-rouvan kapeiden huulten ympärille.",
 }
 
 
@@ -22,16 +21,11 @@ def train_tokenizer(model, dataset, lang):
 
     tokenizer.save_model(f"./data/{dataset}/{lang}")
 
-    # create a custom config.json file for AutoTokenizer
-    with open(f"./data/{dataset}/{lang}/config.json", 'w') as config:
-        json.dump({
-            'model_type': model
-        }, config)
-
     # Load the tokenizer and output a sample tokenization
-    test_tokenizer = AutoTokenizer.from_pretrained(f"./data/{dataset}/{lang}")
+    test_tokenizer = AutoTokenizer.from_pretrained(f"./data/{dataset}/{lang}", tokenizer_type=model)
+    print(f'Loaded tokenizer with vocab size: {len(test_tokenizer)} \n')
     output = test_tokenizer.encode_plus(sample[lang])
-    print(output.tokens())
+    print(output.tokens(), '\n')
 
 
 if __name__ == "__main__":
