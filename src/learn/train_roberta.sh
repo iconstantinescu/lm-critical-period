@@ -13,7 +13,7 @@ python ./src/learn/run_mlm.py \
     --max_seq_length 510 \
     --do_train \
     --do_eval \
-    --output_dir ./checkpoints/roberta-mlm \
+    --output_dir "./checkpoints/roberta-mlm-${SEED}" \
     --overwrite_output_dir \
     --learning_rate 1e-4 \
     --num_train_epochs 5 \
