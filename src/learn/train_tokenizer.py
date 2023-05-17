@@ -1,7 +1,8 @@
-from tokenizers.implementations import ByteLevelBPETokenizer
-from transformers import AutoTokenizer
-
 import argparse
+import os
+
+from tokenizers.implementations import ByteLevelBPETokenizer
+from transformers import AutoTokenizer, AutoModel
 
 sample = {
     "en": "Hello, y'all! How are you 😁? (just testing the tokenizer)",
@@ -12,19 +13,29 @@ sample = {
 
 def train_tokenizer(model, dataset, lang):
 
-    tokenizer = ByteLevelBPETokenizer()
+    bpe_tokenizer = ByteLevelBPETokenizer()
 
     files = [f"./data/{dataset}/{lang}/raw/{split}.txt" for split in ["test", "train", "validation"]]
 
-    tokenizer.train(files=files, vocab_size=32000, min_frequency=2,
-                    special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"])
+    bpe_tokenizer.train(files=files, vocab_size=32000, min_frequency=2)
 
-    tokenizer.save_model(f"./data/{dataset}/{lang}")
+    tokenizer_path = f'./data/{dataset}/{lang}/{model}_tokenizer'
+    if not os.path.exists(tokenizer_path):
+        os.makedirs(tokenizer_path)
 
-    # Load the tokenizer and output a sample tokenization
-    test_tokenizer = AutoTokenizer.from_pretrained(f"./data/{dataset}/{lang}", tokenizer_type=model)
-    print(f'Loaded tokenizer with vocab size: {len(test_tokenizer)} \n')
-    output = test_tokenizer.encode_plus(sample[lang])
+    # save the vocab.json and merges.txt files of the trained bpe tokenizer
+    bpe_tokenizer.save_model(tokenizer_path)
+
+    model_tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, tokenizer_type=model)
+    model_tokenizer.model_max_length = 512
+
+    print(f'Tokenizer vocab size: {len(model_tokenizer)}')
+    print(f'Tokenizer max sequence length: {model_tokenizer.model_max_length} \n')
+
+    # save the full model tokenizer configuration files
+    model_tokenizer.save_pretrained(tokenizer_path)
+
+    output = model_tokenizer.encode_plus(sample[lang])
     print(output.tokens(), '\n')
 
 
