@@ -17,6 +17,8 @@ torchrun --nproc_per_node 4 ./src/learn/run_mlm.py \
     --overwrite_output_dir \
     --learning_rate 1e-4 \
     --num_train_epochs 5 \
+    --streaming \
+    --low_cpu_mem_usage \
     --fp16 \
     --seed ${SEED} \
     ${EXTRA_FLAGS}
