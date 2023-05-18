@@ -2,7 +2,8 @@ DATA_DIR=$1
 SEED=$2
 EXTRA_FLAGS=$3
 
-python ./src/learn/run_mlm.py \
+python -m torch.distributed.launch \
+    --nproc_per_node 4 ./src/learn/run_mlm.py \
     --model_type roberta \
     --tokenizer_name "${DATA_DIR}/roberta_tokenizer" \
     --cache_dir "${DATA_DIR}/cache" \
