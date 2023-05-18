@@ -8,8 +8,8 @@ torchrun --nproc_per_node 4 ./src/learn/run_mlm.py \
     --cache_dir "${DATA_DIR}/cache" \
     --train_file "${DATA_DIR}/raw/train.txt" \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
-    --per_device_train_batch_size 16 \
-    --per_device_eval_batch_size 16 \
+    --per_device_train_batch_size 8 \
+    --per_device_eval_batch_size 8 \
     --max_seq_length 510 \
     --do_train \
     --do_eval \
