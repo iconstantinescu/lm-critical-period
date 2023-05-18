@@ -2,14 +2,14 @@ DATA_DIR=$1
 SEED=$2
 EXTRA_FLAGS=$3
 
-python ./src/learn/run_clm.py \
+torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --model_type gpt2 \
     --tokenizer_name "${DATA_DIR}/gpt2_tokenizer" \
     --cache_dir "${DATA_DIR}/cache" \
     --train_file "${DATA_DIR}/raw/train.txt" \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
-    --per_device_train_batch_size 8 \
-    --per_device_eval_batch_size 8 \
+    --per_device_train_batch_size 4 \
+    --per_device_eval_batch_size 4 \
     --block_size 512 \
     --do_train \
     --do_eval \
