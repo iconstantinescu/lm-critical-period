@@ -10,13 +10,15 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
     --per_device_train_batch_size 8 \
     --per_device_eval_batch_size 8 \
+    --gradient_accumulation_steps 64 \
     --max_seq_length 510 \
     --do_train \
     --do_eval \
     --output_dir "./checkpoints/roberta-mlm-${SEED}" \
     --overwrite_output_dir \
-    --learning_rate 1e-4 \
-    --num_train_epochs 5 \
+    --learning_rate 5e-4 \
+    --warmup_ratio 0.06 \
+    --max_steps  100000\
     --streaming \
     --low_cpu_mem_usage \
     --fp16 \
