@@ -19,6 +19,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --learning_rate 5e-4 \
     --warmup_ratio 0.06 \
     --max_steps  100000\
+    --save_steps 0.1\
     --streaming \
     --low_cpu_mem_usage \
     --fp16 \
