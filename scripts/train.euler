@@ -5,7 +5,7 @@
 #SBATCH --mem-per-cpu=16384
 #SBATCH --gpus=8
 #SBATCH --gres=gpumem:11264m
-#SBATCH --time=47:00:00
+#SBATCH --time=118:00:00
 #SBATCH --open-mode=truncate
 #SBATCH --mail-type=END,FAIL
 
