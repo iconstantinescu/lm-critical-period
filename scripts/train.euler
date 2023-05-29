@@ -3,7 +3,7 @@
 #SBATCH -n 1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=16384
-#SBATCH --gpus=10
+#SBATCH --gpus=8
 #SBATCH --gres=gpumem:11264m
 #SBATCH --time=118:00:00
 #SBATCH --open-mode=truncate

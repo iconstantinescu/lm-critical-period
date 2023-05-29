@@ -2,7 +2,7 @@ DATA_DIR=$1
 SEED=$2
 EXTRA_FLAGS=$3
 
-torchrun --nproc_per_node 10 ./src/learn/run_clm.py \
+torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --model_type gpt2 \
     --tokenizer_name "${DATA_DIR}/gpt2_tokenizer" \
     --cache_dir "${DATA_DIR}/cache" \
