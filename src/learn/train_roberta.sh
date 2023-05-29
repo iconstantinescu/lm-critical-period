@@ -2,7 +2,7 @@ DATA_DIR=$1
 SEED=$2
 EXTRA_FLAGS=$3
 
-torchrun --nproc_per_node 16 ./src/learn/run_mlm.py \
+torchrun --nproc_per_node 10 ./src/learn/run_mlm.py \
     --model_type roberta \
     --tokenizer_name "${DATA_DIR}/roberta_tokenizer" \
     --cache_dir "${DATA_DIR}/cache" \
@@ -16,12 +16,12 @@ torchrun --nproc_per_node 16 ./src/learn/run_mlm.py \
     --do_eval \
     --evaluation_strategy epoch \
     --output_dir "./checkpoints/roberta-mlm-${SEED}" \
+    --save_strategy "epoch" \
     --overwrite_output_dir \
     --learning_rate 5e-4 \
     --mlm_probability 0.4 \
     --warmup_ratio 0.06 \
     --num_train_epochs 12 \
-    --save_steps 0.1\
     --streaming \
     --low_cpu_mem_usage \
     --fp16 \

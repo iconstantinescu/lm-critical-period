@@ -2,7 +2,7 @@ DATA_DIR=$1
 SEED=$2
 EXTRA_FLAGS=$3
 
-torchrun --nproc_per_node 16 ./src/learn/run_clm.py \
+torchrun --nproc_per_node 10 ./src/learn/run_clm.py \
     --model_type gpt2 \
     --tokenizer_name "${DATA_DIR}/gpt2_tokenizer" \
     --cache_dir "${DATA_DIR}/cache" \
@@ -13,12 +13,12 @@ torchrun --nproc_per_node 16 ./src/learn/run_clm.py \
     --block_size 512 \
     --do_train \
     --do_eval \
-    --evaluation_strategy epoch \
+    --evaluation_strategy "epoch" \
     --output_dir "./checkpoints/gpt2-clm-${SEED}" \
+    --save_strategy "epoch" \
     --overwrite_output_dir \
     --learning_rate 1e-4 \
     --num_train_epochs 12 \
-    --save_steps 0.1\
     --streaming \
     --low_cpu_mem_usage \
     --fp16 \
