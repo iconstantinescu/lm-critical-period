@@ -11,6 +11,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
     --cache_dir "${DATA_DIR}/cache" \
     --run_name "roberta-${DATA_DIR}-${SEED}-${DATE}" \
+    --report_to wandb \
     --output_dir "./checkpoints/roberta-mlm-${SEED}-${DATE}" \
     --overwrite_output_dir \
     --per_device_train_batch_size 8 \
