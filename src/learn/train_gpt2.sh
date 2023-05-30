@@ -10,6 +10,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
     --per_device_train_batch_size 4 \
     --per_device_eval_batch_size 4 \
+    --gradient_accumulation_steps 128 \
     --block_size 512 \
     --do_train \
     --do_eval \
