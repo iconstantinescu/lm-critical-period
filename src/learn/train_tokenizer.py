@@ -1,8 +1,9 @@
 import argparse
 import os
 
+from tokenizers import AddedToken
 from tokenizers.implementations import ByteLevelBPETokenizer
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer
 
 sample = {
     "en": "Hello, y'all! How are you 😁? (just testing the tokenizer)",
@@ -28,6 +29,7 @@ def train_tokenizer(model, dataset, lang):
 
     model_tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, tokenizer_type=model)
     model_tokenizer.model_max_length = 512
+    model_tokenizer.add_special_tokens({"pad_token": AddedToken("<pad>", normalized=True)})
 
     print(f'Tokenizer vocab size: {len(model_tokenizer)}')
     print(f'Tokenizer max sequence length: {model_tokenizer.model_max_length} \n')
