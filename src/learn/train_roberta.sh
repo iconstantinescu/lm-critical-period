@@ -2,7 +2,7 @@ DATA_DIR=$1
 SEED=$2
 EXTRA_FLAGS=$3
 
-DATE=$(date +%d/%m)
+DATE=$(date +%d%m)
 
 torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --model_type roberta \
