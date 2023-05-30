@@ -16,10 +16,11 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --per_device_train_batch_size 8 \
     --per_device_eval_batch_size 8 \
     --gradient_accumulation_steps 64 \
+    --eval_accumulation_steps 64 \
     --max_seq_length 510 \
     --do_train \
     --do_eval \
-    --evaluation_strategy epoch \
+    --evaluation_strategy "epoch" \
     --save_strategy "epoch" \
     --learning_rate 5e-4 \
     --mlm_probability 0.4 \
@@ -28,5 +29,6 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --streaming \
     --low_cpu_mem_usage \
     --fp16 \
+    --ddp_timeout 7200 \
     --seed ${SEED} \
     ${EXTRA_FLAGS}
