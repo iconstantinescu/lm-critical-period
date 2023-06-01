@@ -22,4 +22,6 @@ command:
   - ${env}
   - bash
   - ${program}
+  - "--max_eval_samples 100"
+  - "--max_train_samples 100"
   - ${args}
