@@ -85,7 +85,7 @@ then
 else
   echo 'Doing normal training'
   MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
-  PROJECT=${project_name} DO_TEST=${do_test} \
+  PROJECT=${project_name} DO_TEST=${do_test} CHECKPOINT=${checkpoint} \
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
           --output="./logs/train_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
           scripts/train.euler
