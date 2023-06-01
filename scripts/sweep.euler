@@ -14,20 +14,9 @@ module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
 source /cluster/work/cotterell/iconstantine/lm-critical-period/venv/bin/activate
 
 
-#! Full path to application executable:
-path="/cluster/work/cotterell/iconstantine/lm-critical-period/src/learn/"
-
-application="train_model.sh"
-
-#! Run options for the application:
-prefix=""
-options=""
-
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
                              # in which sbatch is run.
-
-CMD="$prefix $path$application $options"
 
 cd $workdir
 echo -e "Changed directory to `pwd`.\n"
@@ -41,5 +30,5 @@ echo "Current directory: `pwd`"
 
 echo -e "\nExecuting command:\n==================\n$CMD\n"
 
-eval $CMD
+wandb agent --count 10 $SWEEP_ID
 
