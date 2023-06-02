@@ -10,7 +10,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
     --cache_dir "${DATA_DIR}/cache" \
     --run_name ${MODEL_NAME} \
-    --report_to wandb \
+    --report_to "wandb" \
     --output_dir "./checkpoints/${MODEL_NAME}" \
     --overwrite_output_dir \
     --per_device_train_batch_size 4 \
@@ -21,7 +21,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --do_train \
     --do_eval \
     --evaluation_strategy "steps" \
-    --eval_steps 0.01 \
+    --eval_steps 50 \
     --max_eval_samples 50000 \
     --save_strategy "epoch" \
     --learning_rate 1e-4 \
