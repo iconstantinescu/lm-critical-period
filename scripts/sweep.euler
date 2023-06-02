@@ -13,6 +13,9 @@ module purge
 module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
 source /cluster/work/cotterell/iconstantine/lm-critical-period/venv/bin/activate
 
+export DATA_DIR="data/${DATASET}/${LANG1}"
+export MODEL_NAME="${MODEL}-${LANG1}-${SEED}-${DATE}"
+
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory

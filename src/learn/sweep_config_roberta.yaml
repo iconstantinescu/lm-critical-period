@@ -20,10 +20,10 @@ early_terminate:
   eta: 2
 command:
   - ${env}
-  - "DATA_DIR='data/${DATASET}/${LANG1}'"
-  - "MODEL_NAME='${MODEL}-${LANG1}-${SEED}-${DATE}'"
   - bash
   - ${program}
-  - "--max_eval_samples 100"
-  - "--max_train_samples 100"
+  - "--gradient_accumulation_steps 1"
+  - "--logging_steps 1"
+  - "--max_eval_samples 120"
+  - "--max_train_samples 120"
   - ${args}

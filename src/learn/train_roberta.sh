@@ -19,6 +19,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --eval_accumulation_steps 64 \
     --max_seq_length 510 \
     --do_train \
+    --logging_steps 100 \
     --do_eval \
     --evaluation_strategy "steps" \
     --eval_steps 0.02 \

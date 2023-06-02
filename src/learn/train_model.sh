@@ -12,7 +12,7 @@ extra_flags=""
 
 if [ $DO_TEST = true ]
 then
-  extra_flags="${extra_flags} --max_eval_samples 100 --max_train_samples 100"
+  extra_flags="${extra_flags} --gradient_accumulation_steps 1 --logging_steps 1 --max_eval_samples 120 --max_train_samples 120"
 fi
 
 if [ ! -z "${CHECKPOINT}" ]
