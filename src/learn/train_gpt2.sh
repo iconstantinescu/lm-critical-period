@@ -20,10 +20,12 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --block_size 512 \
     --do_train \
     --do_eval \
-    --evaluation_strategy "epoch" \
+    --evaluation_strategy "steps" \
+    --eval_steps 0.01 \
+    --max_eval_samples 50000 \
     --save_strategy "epoch" \
     --learning_rate 1e-4 \
-    --num_train_epochs 12 \
+    --num_train_epochs 24 \
     --streaming \
     --low_cpu_mem_usage \
     --fp16 \

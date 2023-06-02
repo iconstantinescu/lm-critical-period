@@ -16,7 +16,7 @@ parameters:
     values: [0.06]
 early_terminate:
   type: hyperband
-  min_iter: 3
+  min_iter: 5
   eta: 2
 command:
   - ${env}
