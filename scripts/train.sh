@@ -11,7 +11,7 @@ do_sweep=false
 do_test=false
 timestamp=$(date +%s)
 
-while getopts "1:2:m:d:s:c:tw" option; do
+while getopts "1:2:m:d:s:c:w:t" option; do
   case $option in
     1)
       lang1="$OPTARG"
@@ -36,6 +36,7 @@ while getopts "1:2:m:d:s:c:tw" option; do
       project_name="test"
       ;;
     w)
+      sweep_id="$OPTARG"
       do_sweep=true
       ;;
     *)
@@ -60,23 +61,12 @@ if [ $do_sweep = true ] ;
 then
   echo 'Doing hyperparameter sweep'
 
-  sweep_name="sweep-${model}-${lang1}${lang2}-${training_mode}"
-
-  # Run the wandb sweep command and store the output in a temporary file
-  wandb sweep --project "${project_name}" --name "${sweep_name}" "./src/learn/sweep_config_${model_name}.yaml" >temp_output.txt 2>&1
-
-  # Extract the sweep ID using awk
-  sweep_id=$(awk '/wandb agent/{ match($0, /wandb agent (.+)/, arr); print arr[1]; }' temp_output.txt)
-
-  # Remove the temporary output file
-  rm temp_output.txt
-
   # Run sweep agents in parallel
   for i in 1 2 3 4
   do
     MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
     PROJECT=${project_name} SWEEP_ID=${sweep_id} DO_TEST=${do_test} \
-    sbatch  --job-name=$sweep_name \
+    sbatch  --job-name="sweep-${model}-${lang1}${lang2}-${training_mode}" \
             --output="./logs/sweep_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
             scripts/sweep.euler
   done

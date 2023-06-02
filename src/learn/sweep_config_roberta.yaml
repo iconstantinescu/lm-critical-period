@@ -20,6 +20,8 @@ early_terminate:
   eta: 2
 command:
   - ${env}
+  - "DATA_DIR='data/${DATASET}/${LANG1}'"
+  - "MODEL_NAME='${MODEL}-${LANG1}-${SEED}-${DATE}'"
   - bash
   - ${program}
   - "--max_eval_samples 100"
