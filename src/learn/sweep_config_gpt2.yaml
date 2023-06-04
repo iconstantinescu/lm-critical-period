@@ -3,7 +3,7 @@ project: critical-period
 method: bayes
 metric:
   goal: minimize
-  name: eval_loss
+  name: eval/loss
 parameters:
   gradient_accumulation_steps:
     values: [16, 32, 64, 128, 256]
