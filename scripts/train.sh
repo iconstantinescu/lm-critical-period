@@ -65,7 +65,7 @@ then
   for i in 1 2 3 4
   do
     MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
-    PROJECT=${project_name} SWEEP_ID=${sweep_id} DO_TEST=${do_test} \
+    PROJECT=${project_name} SWEEP_ID=${sweep_id} DO_TEST=${do_test} IDX=${i} \
     sbatch  --job-name="sweep-${model}-${lang1}${lang2}-${training_mode}" \
             --output="./logs/sweep_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}_${i}.out" \
             scripts/sweep.euler
