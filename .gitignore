@@ -131,7 +131,7 @@ dmypy.json
 # Project specific
 data/
 checkpoints/
-logs/
+
 wandb/
 
 .idea
