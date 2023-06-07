@@ -4,8 +4,11 @@ module purge
 module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
 source /cluster/work/cotterell/iconstantine/lm-critical-period/venv/bin/activate
 
+model=$1
+shift
 
 project_name="critical-period"
+training_mode="sequential"
 
 
 while getopts "1:2:m:p:" option; do
@@ -17,7 +20,7 @@ while getopts "1:2:m:p:" option; do
       lang2="$OPTARG"
       ;;
     m)
-      model="$OPTARG"
+      training_mode="$OPTARG"
       ;;
     p)
       project_name="$OPTARG"
