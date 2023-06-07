@@ -7,5 +7,5 @@ timestamp=$(date +%s)
 
 MODEL=${model} DATASET=${dataset} LANGUAGE=${language} \
 sbatch  --job-name="train-tokenizer-${dataset}-${language}" \
-        --output="./logs/train_tokenizer_${dataset}_${language}_${timestamp}.out" \
+        --output="./logs/trainings/train_tokenizer_${dataset}_${language}_${timestamp}.out" \
         scripts/train_tokenizer.euler

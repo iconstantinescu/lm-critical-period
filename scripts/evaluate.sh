@@ -7,5 +7,5 @@ timestamp=$(date +%s)
 
 TASK=${task} MODEL=${model} MODEL_TYPE=${model_type} \
 sbatch  --job-name="evaluate-${task}-${model}" \
-        --output="./logs/evaluate_${task}_${model}_${timestamp}.out" \
+        --output="./logs/evaluations/evaluate_${task}_${model}_${timestamp}.out" \
         scripts/evaluate.euler

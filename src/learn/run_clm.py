@@ -162,7 +162,7 @@ class DataTrainingArguments:
     train_file: Optional[str] = field(default=None, metadata={"help": "The input training data file (a text file)."})
     validation_file: Optional[str] = field(
         default=None,
-        metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
+        metadata={"help": "An optional input evaluation data file to evaluations the perplexity on (a text file)."},
     )
     max_train_samples: Optional[int] = field(
         default=None,

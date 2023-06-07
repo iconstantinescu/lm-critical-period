@@ -10,6 +10,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
     --cache_dir "${DATA_DIR}/cache" \
     --run_name ${MODEL_NAME} \
+    --seed ${SEED} \
     --report_to wandb \
     --output_dir "./checkpoints/${MODEL_NAME}" \
     --overwrite_output_dir \
@@ -32,6 +33,6 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --streaming \
     --low_cpu_mem_usage \
     --fp16 \
+    --torch_compile \
     --ddp_timeout 7200 \
-    --seed ${SEED} \
     ${EXTRA_FLAGS}

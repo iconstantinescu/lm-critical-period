@@ -65,19 +65,19 @@ then
   for i in 1 2 3 4
   do
     MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
-    PROJECT=${project_name} SWEEP_ID=${sweep_id} DO_TEST=${do_test} IDX=${i} \
+    PROJECT=${project_name} DO_TEST=${do_test} SWEEP_ID=${sweep_id} IDX=${i} \
     sbatch  --job-name="sweep-${model}-${lang1}${lang2}-${training_mode}" \
-            --output="./logs/sweep_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}_${i}.out" \
-            scripts/sweep.euler
+            --output="./logs/sweeps/sweep_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}_${i}.out" \
+            scripts/train.euler
   done
 
 
 else
   echo 'Doing normal training'
   MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
-  PROJECT=${project_name} DO_TEST=${do_test} CHECKPOINT=${checkpoint} \
+  PROJECT=${project_name} CHECKPOINT=${checkpoint} DO_TEST=${do_test} \
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
-          --output="./logs/train_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
+          --output="./logs/trainings/train_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
           scripts/train.euler
 fi
 
