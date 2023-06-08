@@ -46,7 +46,7 @@ for lang, ratios in SAMPLE_RATIOS.items():
                     break
 
                 elif block_idx in sampled_blocks or len(next_line_block) < BLOCK_SIZE:
-                    samples.extend(next_line_block)
+                    samples.append(''.join(next_line_block))
 
                 block_idx += 1
 
@@ -56,6 +56,9 @@ for lang, ratios in SAMPLE_RATIOS.items():
     train_split_idx = math.floor(len(doc) * SPLIT_RATIOS[0])
     valid_split_idx = math.floor(len(doc) * (SPLIT_RATIOS[0] + SPLIT_RATIOS[1]))
 
+    # each entry in the doc is a block, so we shuffle by blocks
+    random.shuffle(doc)
+
     train = doc[:train_split_idx]
     valid = doc[train_split_idx:valid_split_idx]
     test = doc[valid_split_idx:]
@@ -63,17 +66,17 @@ for lang, ratios in SAMPLE_RATIOS.items():
     if not os.path.exists(f'./data/unified_clean/{lang}/raw'):
         os.makedirs(f'./data/unified_clean/{lang}/raw')
 
-    all_out = open(f'./data/unified_clean/{lang}/raw/all.txt', "w")
+    full_out = open(f'./data/unified_clean/{lang}/raw/full.txt', "w")
     train_out = open(f'./data/unified_clean/{lang}/raw/train.txt', "w")
     valid_out = open(f'./data/unified_clean/{lang}/raw/validation.txt', "w")
     test_out = open(f'./data/unified_clean/{lang}/raw/test.txt', "w")
 
-    all_out.write(''.join(doc))
+    full_out.write(''.join(doc))
     train_out.write(''.join(train))
-    test_out.write(''.join(valid))
-    valid_out.write(''.join(test))
+    valid_out.write(''.join(valid))
+    test_out.write(''.join(test))
 
-    all_out.close()
+    full_out.close()
     train_out.close()
     valid_out.close()
     test_out.close()
