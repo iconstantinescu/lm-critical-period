@@ -63,14 +63,17 @@ for lang, ratios in SAMPLE_RATIOS.items():
     if not os.path.exists(f'./data/unified_clean/{lang}/raw'):
         os.makedirs(f'./data/unified_clean/{lang}/raw')
 
+    all_out = open(f'./data/unified_clean/{lang}/raw/all.txt', "w")
     train_out = open(f'./data/unified_clean/{lang}/raw/train.txt', "w")
     valid_out = open(f'./data/unified_clean/{lang}/raw/validation.txt', "w")
     test_out = open(f'./data/unified_clean/{lang}/raw/test.txt', "w")
 
+    all_out.write(''.join(doc))
     train_out.write(''.join(train))
     test_out.write(''.join(valid))
     valid_out.write(''.join(test))
 
+    all_out.close()
     train_out.close()
     valid_out.close()
     test_out.close()
