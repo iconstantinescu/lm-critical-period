@@ -8,7 +8,7 @@ parameters:
   learning_rate:
     distribution: log_uniform_values
     min: 10e-5
-    max: 10e-2
+    max: 10e-3
   mlm_probability:
     values: [0.15, 0.3, 0.4, 0.5]
   warmup_ratio:

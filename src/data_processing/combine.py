@@ -5,8 +5,8 @@ from itertools import islice
 
 DATASETS = ['gutenberg', 'open_subtitles', 'wikipedia']
 SAMPLE_RATIOS = {
-    'en': [0.031, 0.092, 0.042],
-    'de': [1, 1, 0.114],
+    'en': [0.036, 0.118, 0.049],
+    'de': [1, 1, 0.160],
     'fi': [1, 1, 1]
 }
 
