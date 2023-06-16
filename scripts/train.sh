@@ -1,8 +1,7 @@
 #!/bin/bash
 
-model=$1
-shift
-
+model="gpt2"
+lang1="en"
 dataset="unified_clean"
 training_mode="sequential"
 seed=42
@@ -11,8 +10,31 @@ do_sweep=false
 do_test=false
 timestamp=$(date +%s)
 
-while getopts "1:2:m:d:s:c:w:t" option; do
+Help()
+{
+   # Display Help
+   echo "Script to run model training."
+   echo
+   echo "Syntax: train.sh [-n|1|2|m|d|s|c|t|w]"
+   echo "options:"
+   echo "n     Model name (gpt2 or roberta). Default: gpt2"
+   echo "1     First language to train on. Default: en"
+   echo "2     Second language to train on"
+   echo "m     Training mode: sequential or interleaved. Default: sequential"
+   echo "d     Dataset to use. Default: unified_clean"
+   echo "s     Random seed number. Default: 42"
+   echo "c     Checkpoint path to resume training"
+   echo "t     Run in test/debug mode (fewer samples). Default: false"
+   echo "w     Wandb sweep id for hyperparameter tuning (sweep must be started already)"
+
+   echo
+}
+
+while getopts "n:1:2:m:d:s:c:w:th" option; do
   case $option in
+    n)
+      model="$OPTARG"
+      ;;
     1)
       lang1="$OPTARG"
       ;;
@@ -38,6 +60,10 @@ while getopts "1:2:m:d:s:c:w:t" option; do
     w)
       sweep_id="$OPTARG"
       do_sweep=true
+      ;;
+    h)
+      Help
+      exit
       ;;
     *)
       echo "Usage: $0 [-f file_name] [-d directory_name]"
