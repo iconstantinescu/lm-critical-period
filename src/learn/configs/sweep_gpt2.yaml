@@ -1,5 +1,4 @@
 program: ./src/learn/train_gpt2.sh
-project: critical-period
 method: bayes
 metric:
   goal: minimize

@@ -25,12 +25,13 @@ Help()
    echo "s     Random seed number. Default: 42"
    echo "c     Checkpoint path to resume training"
    echo "t     Run in test/debug mode (fewer samples). Default: false"
+   echo "p     Project name for wandb logging. Default: critical-period"
    echo "w     Wandb sweep id for hyperparameter tuning (sweep must be started already)"
 
    echo
 }
 
-while getopts "n:1:2:m:d:s:c:w:th" option; do
+while getopts "n:1:2:m:d:s:c:p:w:th" option; do
   case $option in
     n)
       model="$OPTARG"
@@ -57,6 +58,9 @@ while getopts "n:1:2:m:d:s:c:w:th" option; do
       do_test=true
       project_name="test"
       ;;
+    p)
+      project_name="$OPTARG"
+      ;;
     w)
       sweep_id="$OPTARG"
       do_sweep=true
@@ -82,6 +86,7 @@ echo "Seed: $seed"
 echo "Checkpoint: $checkpoint"
 echo "Do test: $do_test"
 echo "Do sweep: $do_sweep"
+echo "Project name: $project_name"
 
 if [ $do_sweep = true ] ;
 then
