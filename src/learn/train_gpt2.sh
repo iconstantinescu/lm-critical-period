@@ -22,12 +22,10 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --do_train \
     --logging_steps 50 \
     --do_eval \
-    --evaluation_strategy "steps" \
-    --eval_steps 0.02 \
+    --evaluation_strategy "epoch" \
     --save_strategy "epoch" \
     --learning_rate 1e-4 \
     --num_train_epochs 12 \
-    --streaming \
     --low_cpu_mem_usage \
     --fp16 \
     --ddp_timeout 7200 \

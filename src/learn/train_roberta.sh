@@ -22,15 +22,12 @@ torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
     --do_train \
     --logging_steps 50 \
     --do_eval \
-    --evaluation_strategy "steps" \
-    --eval_steps 0.02 \
-    --max_eval_samples 50000 \
+    --evaluation_strategy "epoch" \
     --save_strategy "epoch" \
     --learning_rate 5e-4 \
     --mlm_probability 0.4 \
     --warmup_ratio 0.06 \
     --num_train_epochs 12 \
-    --streaming \
     --low_cpu_mem_usage \
     --fp16 \
     --ddp_timeout 7200 \

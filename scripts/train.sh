@@ -66,7 +66,7 @@ while getopts "n:1:2:m:d:s:c:w:th" option; do
       exit
       ;;
     *)
-      echo "Usage: $0 [-f file_name] [-d directory_name]"
+      echo "Usage: $0 [-n model_name] [-d dataset] [-1 first language]"
       exit 1
       ;;
   esac

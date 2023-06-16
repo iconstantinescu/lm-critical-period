@@ -23,6 +23,8 @@ command:
   - ${program}
   - "--gradient_accumulation_steps 1"
   - "--logging_steps 1"
+  - "--evaluation_strategy steps"
+  - "--eval_steps 0.02"
   - "--max_eval_samples 120"
   - "--max_train_samples 120"
   - ${args}
