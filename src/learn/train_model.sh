@@ -6,7 +6,7 @@ export WANDB_PROJECT=$PROJECT
 DATE=$(date +%d%m)
 
 DATA_DIR="data/${DATASET}/${LANG1}"
-MODEL_NAME="${MODEL}-${LANG1}-${SEED}-${DATE}"
+MODEL_NAME="${MODEL}-${LANG1}${LANG2}-${MODE}-${SEED}-${DATE}"
 
 extra_flags=""
 
@@ -48,17 +48,44 @@ else
 	python3 ./src/learn/train_tokenizer.py ${MODEL} ${DATASET} ${LANG1}
 fi
 
-export DATA_DIR=${DATA_DIR}
 
 if [ ! -z "${SWEEP_ID}" ]
 then
   # Hyperparameter sweep
-  export MODEL_NAME="${MODEL_NAME}-${IDX}"
-  wandb agent --count 10 ${SWEEP_ID}
+  export MODEL_NAME="${MODEL}-${LANG1}-${SEED}-${DATE}-${IDX}"
+  export DATA_DIR=${DATA_DIR}
+
+  wandb agent --count 5 ${SWEEP_ID}
+
 else
-  # Normal training
-  export MODEL_NAME=${MODEL_NAME}
-  bash ./src/learn/${application} ${extra_flags}
+  if [ $MODE = "sequential" ]
+  then
+    if [ ! -z "${LANG1}" ]
+    then
+      # Train first language for sequential mode
+      export MODEL_NAME="${MODEL_NAME}-1"
+      export DATA_DIR=${DATA_DIR}
+
+      bash ./src/learn/${application} ${extra_flags}
+
+    elif [ ! -z "${LANG2}" ]
+    then
+      # Train second language for sequential mode
+      export MODEL_NAME="${MODEL_NAME}-2"
+      export DATA_DIR="data/${DATASET}/${LANG2}"
+
+      extra_flags="${extra_flags}  --model_name_or_path checkpoints/${MODEL_NAME}-1"
+      bash ./src/learn/${application} ${extra_flags}
+    fi
+
+  elif [ $MODE = "interleaved" ];
+  then
+    # Train on interleaved dataset
+    export MODEL_NAME="${MODEL_NAME}"
+    export DATA_DIR="data/${DATASET}/${LANG1}-${LANG2}"
+
+    bash ./src/learn/${application} ${extra_flags}
+  fi
 fi
 
 
