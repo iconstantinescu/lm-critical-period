@@ -86,7 +86,7 @@ else
   then
     # Train on interleaved dataset
     export MODEL_NAME="${MODEL_NAME}"
-    export DATA_DIR="data/${DATASET}/${LANG1}-${LANG2}"
+    export DATA_DIR="data/${DATASET}/${LANG1}_${LANG2}"
 
     bash ./src/learn/${application} ${extra_flags}
   fi

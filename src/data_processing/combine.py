@@ -110,7 +110,7 @@ for pair in pairs:
     b = DOC[lang2]
     interleaved = evenly_spaced(a, b)
 
-    train_test_split(interleaved, f'{lang1}-{lang2}')
+    train_test_split(interleaved, f'{lang1}_{lang2}')
 
 
 print('\nFinished successfully!\n')
