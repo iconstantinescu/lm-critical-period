@@ -9,34 +9,32 @@
 #SBATCH --open-mode=truncate
 #SBATCH --mail-type=END,FAIL
 
-module purge
-module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
-source /cluster/work/cotterell/iconstantine/lm-critical-period/venv/bin/activate
-
-
-#! Full path to application executable:
-application="python /cluster/work/cotterell/iconstantine/lm-critical-period/src/data_processing/combine.py"
-source ~/.bashrc
-
-#! Run options for the application:
-options=""
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
                              # in which sbatch is run.
 
-CMD="$application $options"
+module purge
+module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
+source $workdir/venv/bin/activate
+
+
+#! Run options for the application:
+prefix="python3"
+application="src/data_processing/combine.py"
+options=""
+
 
 cd $workdir
 echo -e "Changed directory to `pwd`.\n"
 
-JOBID=$SLURM_JOB_ID
 
-echo -e "JobID: $JOBID\n======"
+echo -e "JobID: $SLURM_JOB_ID\n======"
 echo "Time: `date`"
 echo "Running on master node: `hostname`"
 echo "Current directory: `pwd`"
 
-echo -e "\nExecuting command:\n==================\n$CMD\n"
 
+CMD="$prefix $workdir/$application $options"
+echo -e "\nExecuting command:\n==================\n$CMD\n"
 eval $CMD

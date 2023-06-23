@@ -9,27 +9,28 @@
 #SBATCH --open-mode=truncate
 #SBATCH --mail-type=END,FAIL
 
+
+#! Work directory (i.e. where the job will run):
+workdir="/cluster/work/cotterell/iconstantine/evaluation-pipeline"
+
 module purge
 module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
-source /cluster/work/cotterell/iconstantine/evaluation-pipeline/venv/bin/activate
+source $workdir/venv/bin/activate
 
-
-#! Full path to application executable:
-path="/cluster/work/cotterell/iconstantine/evaluation-pipeline/"
 
 #! Run options for the application:
 case $TASK in
 
   blimp)
-    prefix="python"
+    prefix="python3"
     application="babylm_eval.py"
-    options="$path/models/${MODEL} ${MODEL_TYPE}"
+    options="$workdir/models/${MODEL} ${MODEL_TYPE}"
     ;;
 
   glue)
     prefix=""
     application="finetune_all_tasks.sh"
-    options="$path/models/${MODEL}"
+    options="$workdir/models/${MODEL}"
     ;;
 
   *)
@@ -38,23 +39,16 @@ case $TASK in
 esac
 
 
-#! Work directory (i.e. where the job will run):
-workdir=$path  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
-                             # in which sbatch is run.
-
-CMD="$prefix $path$application $options"
-
 cd $workdir
 echo -e "Changed directory to `pwd`.\n"
 
-JOBID=$SLURM_JOB_ID
 
-echo -e "JobID: $JOBID\n======"
+echo -e "JobID: $SLURM_JOB_ID\n======"
 echo "Time: `date`"
 echo "Running on master node: `hostname`"
 echo "Current directory: `pwd`"
 
+
+CMD="$prefix $workdir/$application $options"
 echo -e "\nExecuting command:\n==================\n$CMD\n"
-
 eval $CMD
-
