@@ -9,7 +9,7 @@ random.seed(42)
 DATASETS = ['gutenberg', 'open_subtitles', 'wikipedia']
 
 SAMPLE_RATIOS = {
-    'en': [0.035, 0.118, 0.048],
+    'en': [0.035, 0.117, 0.048],
     'de': [1, 1, 0.160],
     'fi': [1, 1, 1]
 }
