@@ -6,9 +6,9 @@ export WANDB_PROJECT=$PROJECT
 DATE=$(date +%d%m)
 
 DATA_DIR="data/${DATASET}/${LANG1}"
-MODEL_NAME="${MODEL}-${LANG1}${LANG2}-${MODE}-${SEED}-${DATE}"
+MODEL_NAME="${MODEL}-${CONFIG}-${LANG1}${LANG2}-${MODE}-${SEED}-${DATE}"
 
-extra_flags=""
+extra_flags=$(<"./src/learn/configs/${MODEL}_${CONFIG}.txt")
 
 # Add extra flags for test training
 if [ $DO_TEST = true ]
@@ -19,8 +19,13 @@ fi
 # Check if we resume training from checkpoint
 if [ ! -z "${CHECKPOINT}" ]
 then
-  MODEL_NAME=${CHECKPOINT}
-  extra_flags="${extra_flags} --resume_from_checkpoint checkpoints/${CHECKPOINT}"
+  if [ ! -z "${LANG2}" ]
+  then
+    extra_flags="${extra_flags}  --model_name_or_path checkpoints/${CHECKPOINT}"
+  else
+    MODEL_NAME=${CHECKPOINT}
+    extra_flags="${extra_flags} --resume_from_checkpoint checkpoints/${CHECKPOINT}"
+  fi
 fi
 
 # Select which model type to train
@@ -74,7 +79,6 @@ else
       export MODEL_NAME="${MODEL_NAME}-2"
       export DATA_DIR="data/${DATASET}/${LANG2}"
 
-      extra_flags="${extra_flags}  --model_name_or_path checkpoints/${MODEL_NAME}-1"
       bash ./src/learn/${application} ${extra_flags}
     fi
 

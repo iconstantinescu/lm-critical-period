@@ -25,6 +25,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --evaluation_strategy "epoch" \
     --save_strategy "epoch" \
     --learning_rate 1e-4 \
+    --warmup_ratio 0.06 \
     --num_train_epochs 12 \
     --low_cpu_mem_usage \
     --fp16 \

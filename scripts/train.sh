@@ -24,6 +24,7 @@ Help()
    echo "d     Dataset to use. Default: unified_clean"
    echo "s     Random seed number. Default: 42"
    echo "c     Checkpoint path to resume training"
+   echo "f     Config file for model (extra flags)"
    echo "t     Run in test/debug mode (fewer samples). Default: false"
    echo "p     Project name for wandb logging. Default: critical-period"
    echo "w     Wandb sweep id for hyperparameter tuning (sweep must be started already)"
@@ -31,7 +32,7 @@ Help()
    echo
 }
 
-while getopts "n:1:2:m:d:s:c:p:w:th" option; do
+while getopts "n:1:2:m:d:s:c:f:p:w:th" option; do
   case $option in
     n)
       model="$OPTARG"
@@ -53,6 +54,9 @@ while getopts "n:1:2:m:d:s:c:p:w:th" option; do
       ;;
     c)
       checkpoint="$OPTARG"
+      ;;
+    f)
+      config_file="$OPTARG"
       ;;
     t)
       do_test=true
@@ -84,6 +88,7 @@ echo "Training mode: $training_mode"
 echo "Dataset: $dataset"
 echo "Seed: $seed"
 echo "Checkpoint: $checkpoint"
+echo "Configuration file: $config_file"
 echo "Do test: $do_test"
 echo "Do sweep: $do_sweep"
 echo "Project name: $project_name"
@@ -106,7 +111,7 @@ then
 else
   echo 'Doing normal training'
   MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
-  PROJECT=${project_name} CHECKPOINT=${checkpoint} DO_TEST=${do_test} \
+  PROJECT=${project_name} CHECKPOINT=${checkpoint} CONFIG=${config_file} DO_TEST=${do_test} \
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
           --output="./logs/trainings/train_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
           scripts/train.euler
