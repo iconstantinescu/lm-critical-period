@@ -1,25 +1,59 @@
 import random
 import math
 import os
-from itertools import islice
+import itertools as IT
+
+
+random.seed(42)
 
 DATASETS = ['gutenberg', 'open_subtitles', 'wikipedia']
+
 SAMPLE_RATIOS = {
-    'en': [0.036, 0.118, 0.049],
+    'en': [0.035, 0.118, 0.048],
     'de': [1, 1, 0.160],
     'fi': [1, 1, 1]
 }
 
 BLOCK_SIZE = 10000
-
 SPLIT_RATIOS = [0.83, 0.085, 0.085]
 
-random.seed(42)
+DOC = {
+    'en': [],
+    'de': [],
+    'fi': []
+}
+
+
+def train_test_split(doc, folder):
+    train_split_idx = math.floor(len(doc) * SPLIT_RATIOS[0])
+    valid_split_idx = math.floor(len(doc) * (SPLIT_RATIOS[0] + SPLIT_RATIOS[1]))
+
+    train = doc[:train_split_idx]
+    valid = doc[train_split_idx:valid_split_idx]
+    test = doc[valid_split_idx:]
+
+    if not os.path.exists(f'./data/unified_clean/{folder}/raw'):
+        os.makedirs(f'./data/unified_clean/{folder}/raw')
+
+    full_out = open(f'./data/unified_clean/{folder}/raw/full.txt', "w")
+    train_out = open(f'./data/unified_clean/{folder}/raw/train.txt', "w")
+    valid_out = open(f'./data/unified_clean/{folder}/raw/validation.txt', "w")
+    test_out = open(f'./data/unified_clean/{folder}/raw/test.txt', "w")
+
+    full_out.write(''.join(doc))
+    train_out.write(''.join(train))
+    valid_out.write(''.join(valid))
+    test_out.write(''.join(test))
+
+    full_out.close()
+    train_out.close()
+    valid_out.close()
+    test_out.close()
+
 
 for lang, ratios in SAMPLE_RATIOS.items():
     print('\n')
 
-    doc = []
     for idx, dataset in enumerate(DATASETS):
 
         # count the number of lines in the document
@@ -40,7 +74,7 @@ for lang, ratios in SAMPLE_RATIOS.items():
             samples = []
 
             while True:
-                next_line_block = list(islice(f, BLOCK_SIZE))
+                next_line_block = list(IT.islice(f, BLOCK_SIZE))
 
                 if not next_line_block:
                     break
@@ -51,35 +85,32 @@ for lang, ratios in SAMPLE_RATIOS.items():
                 block_idx += 1
 
             print(dataset, lang, len(samples))
-            doc.extend(samples)
+            DOC[lang].extend(samples)
 
-    train_split_idx = math.floor(len(doc) * SPLIT_RATIOS[0])
-    valid_split_idx = math.floor(len(doc) * (SPLIT_RATIOS[0] + SPLIT_RATIOS[1]))
+    random.shuffle(DOC[lang])  # each entry in the doc is a block, so we shuffle by blocks
+    train_test_split(DOC[lang], lang)
 
-    # each entry in the doc is a block, so we shuffle by blocks
-    random.shuffle(doc)
 
-    train = doc[:train_split_idx]
-    valid = doc[train_split_idx:valid_split_idx]
-    test = doc[valid_split_idx:]
+# Create the interleaved datasets
+def evenly_spaced(*iterables):
+    return [item[1] for item in
+            sorted(IT.chain.from_iterable(
+                zip(IT.count(start=1.0 / (len(seq) + 1),
+                             step=1.0 / (len(seq) + 1)), seq)
+                for seq in iterables))]
 
-    if not os.path.exists(f'./data/unified_clean/{lang}/raw'):
-        os.makedirs(f'./data/unified_clean/{lang}/raw')
 
-    full_out = open(f'./data/unified_clean/{lang}/raw/full.txt', "w")
-    train_out = open(f'./data/unified_clean/{lang}/raw/train.txt', "w")
-    valid_out = open(f'./data/unified_clean/{lang}/raw/validation.txt', "w")
-    test_out = open(f'./data/unified_clean/{lang}/raw/test.txt', "w")
+pairs = [('de', 'en'), ('fi', 'en')]
 
-    full_out.write(''.join(doc))
-    train_out.write(''.join(train))
-    valid_out.write(''.join(valid))
-    test_out.write(''.join(test))
+for pair in pairs:
+    lang1 = pair[0]
+    lang2 = pair[1]
 
-    full_out.close()
-    train_out.close()
-    valid_out.close()
-    test_out.close()
+    a = DOC[lang1]
+    b = DOC[lang2]
+    interleaved = evenly_spaced(a, b)
+
+    train_test_split(interleaved, f'{lang1}-{lang2}')
+
 
 print('\nFinished successfully!\n')
-
