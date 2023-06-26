@@ -30,5 +30,6 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --low_cpu_mem_usage \
     --streaming \
     --fp16 \
+    --ddp_backend gloo \
     --ddp_timeout 7200 \
     ${EXTRA_FLAGS}

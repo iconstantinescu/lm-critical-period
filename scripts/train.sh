@@ -118,7 +118,7 @@ else
   MODEL=${model} DATASET=${dataset} TOKENIZER=${tokenizer} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
   PROJECT=${project_name} CHECKPOINT=${checkpoint} CONFIG=${config_file} DO_TEST=${do_test} \
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
-          --output="./logs/trainings/train_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
+          --output="./logs/trainings/train_${model}_${config_file}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
           scripts/train.euler
 fi
 
