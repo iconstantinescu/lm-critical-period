@@ -30,7 +30,7 @@ case $TASK in
   glue)
     prefix=""
     application="finetune_all_tasks.sh"
-    options="$workdir/models/${MODEL}"
+    options="$workdir/models/${MODEL} 5e-5 10 32"
     ;;
 
   *)
