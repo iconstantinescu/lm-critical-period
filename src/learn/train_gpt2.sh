@@ -28,6 +28,7 @@ torchrun --nproc_per_node 8 ./src/learn/run_clm.py \
     --warmup_ratio 0.06 \
     --num_train_epochs 12 \
     --low_cpu_mem_usage \
+    --streaming \
     --fp16 \
     --ddp_timeout 7200 \
     ${EXTRA_FLAGS}
