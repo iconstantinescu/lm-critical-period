@@ -15,24 +15,25 @@ Help()
    # Display Help
    echo "Script to run model training."
    echo
-   echo "Syntax: train.sh [-n|1|2|m|d|s|c|t|w]"
+   echo "Syntax: train.sh [-n|1|2|m|d|t|s|c|f|T|p|w]"
    echo "options:"
    echo "n     Model name (gpt2 or roberta). Default: gpt2"
    echo "1     First language to train on. Default: en"
    echo "2     Second language to train on"
    echo "m     Training mode: sequential or interleaved. Default: sequential"
    echo "d     Dataset to use. Default: unified_clean"
+   echo "t     Path to custom tokenizer"
    echo "s     Random seed number. Default: 42"
    echo "c     Checkpoint path to resume training"
    echo "f     Config file for model (extra flags)"
-   echo "t     Run in test/debug mode (fewer samples). Default: false"
+   echo "T     Run in test/debug mode (fewer samples). Default: false"
    echo "p     Project name for wandb logging. Default: critical-period"
    echo "w     Wandb sweep id for hyperparameter tuning (sweep must be started already)"
 
    echo
 }
 
-while getopts "n:1:2:m:d:s:c:f:p:w:th" option; do
+while getopts "n:1:2:m:d:t:s:c:f:p:w:Th" option; do
   case $option in
     n)
       model="$OPTARG"
@@ -49,6 +50,9 @@ while getopts "n:1:2:m:d:s:c:f:p:w:th" option; do
     d)
       dataset="$OPTARG"
       ;;
+    t)
+      tokenizer="$OPTARG"
+      ;;
     s)
       seed="$OPTARG"
       ;;
@@ -58,16 +62,16 @@ while getopts "n:1:2:m:d:s:c:f:p:w:th" option; do
     f)
       config_file="$OPTARG"
       ;;
-    t)
-      do_test=true
-      project_name="test"
-      ;;
     p)
       project_name="$OPTARG"
       ;;
     w)
       sweep_id="$OPTARG"
       do_sweep=true
+      ;;
+    T)
+      do_test=true
+      project_name="test"
       ;;
     h)
       Help
@@ -86,6 +90,7 @@ echo "Language 1: $lang1"
 echo "Language 2: $lang2"
 echo "Training mode: $training_mode"
 echo "Dataset: $dataset"
+echo "Custom tokenizer: $tokenizer"
 echo "Seed: $seed"
 echo "Checkpoint: $checkpoint"
 echo "Configuration file: $config_file"
@@ -100,7 +105,7 @@ then
   # Run sweep agents in parallel
   for i in 1 2 3 4
   do
-    MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
+    MODEL=${model} DATASET=${dataset} TOKENIZER=${tokenizer} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
     PROJECT=${project_name} DO_TEST=${do_test} SWEEP_ID=${sweep_id} IDX=${i} \
     sbatch  --job-name="sweep-${model}-${lang1}${lang2}-${training_mode}" \
             --output="./logs/sweeps/sweep_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}_${i}.out" \
@@ -110,7 +115,7 @@ then
 
 else
   echo 'Doing normal training'
-  MODEL=${model} DATASET=${dataset} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
+  MODEL=${model} DATASET=${dataset} TOKENIZER=${tokenizer} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
   PROJECT=${project_name} CHECKPOINT=${checkpoint} CONFIG=${config_file} DO_TEST=${do_test} \
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
           --output="./logs/trainings/train_${model}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \

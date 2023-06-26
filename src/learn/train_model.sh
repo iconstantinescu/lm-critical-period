@@ -44,10 +44,15 @@ case $MODEL in
     ;;
 esac
 
-# Train tokenizer if it has not been trained before
-if [ -d "${DATA_DIR}/${MODEL}_tokenizer" ];
+# Train default tokenizer if it has not been trained before
+if [ ! -z "${TOKENIZER}" ]
 then
-  echo "Tokenizer is already trained."
+  echo "Using custom tokenizer ${TOKENIZER}"
+  extra_flags="${extra_flags} --tokenizer_name data/${DATASET}/${TOKENIZER}"
+
+elif [ -d "${DATA_DIR}/${MODEL}_tokenizer" ];
+then
+  echo "Default tokenizer is already trained."
 else
 	echo "Did not find trained tokenizer. Training from scratch."
 	python3 ./src/learn/train_tokenizer.py ${MODEL} ${DATASET} ${LANG1}
