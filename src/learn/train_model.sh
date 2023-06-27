@@ -70,7 +70,15 @@ then
 else
   if [ $MODE = "sequential" ]
   then
-    if [ ! -z "${LANG1}" ]
+    if [ ! -z "${LANG2}" ]
+    then
+      # Train second language for sequential mode
+      export MODEL_NAME="${MODEL_NAME}-2"
+      export DATA_DIR="data/${DATASET}/${LANG2}"
+
+      bash ./src/learn/${application} ${extra_flags}
+
+    elif [ ! -z "${LANG1}" ]
     then
       # Train first language for sequential mode
       export MODEL_NAME="${MODEL_NAME}-1"
@@ -78,13 +86,6 @@ else
 
       bash ./src/learn/${application} ${extra_flags}
 
-    elif [ ! -z "${LANG2}" ]
-    then
-      # Train second language for sequential mode
-      export MODEL_NAME="${MODEL_NAME}-2"
-      export DATA_DIR="data/${DATASET}/${LANG2}"
-
-      bash ./src/learn/${application} ${extra_flags}
     fi
 
   elif [ $MODE = "interleaved" ];
