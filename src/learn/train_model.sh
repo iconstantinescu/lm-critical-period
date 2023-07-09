@@ -19,7 +19,7 @@ fi
 # Check if we resume training from checkpoint
 if [ ! -z "${CHECKPOINT}" ]
 then
-  if [ ! -z "${LANG2}" ]
+  if [ ! -z "${LANG2}" ] && [ $MODE = "sequential" ]
   then
     extra_flags="${extra_flags}  --model_name_or_path checkpoints/${CHECKPOINT}"
   else
