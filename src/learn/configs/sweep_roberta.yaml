@@ -5,7 +5,7 @@ metric:
   name: eval/loss
 parameters:
   gradient_accumulation_steps:
-    values: [64, 128, 256, 512]
+    values: [16, 32, 64, 128, 256]
   learning_rate:
     distribution: log_uniform_values
     min: 1e-5
