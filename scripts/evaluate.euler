@@ -13,6 +13,9 @@
 #! Work directory (i.e. where the job will run):
 workdir="/cluster/work/cotterell/iconstantine/evaluation-pipeline"
 
+#! Model directory (i.e. where the model checkpoints are saved):
+modeldir="/cluster/work/cotterell/iconstantine/lm-critical-period/checkpoints"
+
 module purge
 module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
 source $workdir/venv/bin/activate
@@ -24,13 +27,13 @@ case $TASK in
   blimp)
     prefix="python3"
     application="babylm_eval.py"
-    options="$workdir/models/${MODEL} ${MODEL_TYPE}"
+    options="$modeldir/${MODEL} ${MODEL_TYPE}"
     ;;
 
   glue)
     prefix=""
     application="finetune_all_tasks.sh"
-    options="$workdir/models/${MODEL} 5e-5 10 32"
+    options="$modeldir/${MODEL} 5e-5 10 32"
     ;;
 
   *)
