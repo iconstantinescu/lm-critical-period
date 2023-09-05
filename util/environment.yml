@@ -1,0 +1,16 @@
+name: critical-period
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.10
+  - tqdm
+  - pandas
+  - scipy
+  - matplotlib
+  - seaborn
+  - pylint
+  - pip
+  - pip:
+    - ipdb
