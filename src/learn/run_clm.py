@@ -33,6 +33,7 @@ from typing import Optional
 import datasets
 import evaluate
 import torch
+from torch.functional import F
 from datasets import load_dataset
 
 import transformers
@@ -270,6 +271,40 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
 
         # import ipdb; ipdb.set_trace()
         return loss
+
+
+def estimate_fisher_information_matrix(trainer, model, dataset):
+    dataloader = trainer.get_test_dataloader(dataset)
+    criterion = torch.nn.CrossEntropyLoss()
+
+    fisher_unnormed = [0 for _ in model.parameters()]
+    n_batches = 0
+
+    for batch in dataloader:
+        # Get model predictions
+        predictions = model(**(batch))
+        logits = predictions.logits[:, :-1].contiguous()
+        with torch.no_grad():
+            probs = F.softmax(logits, dim=-1)
+            dist = torch.distributions.categorical.Categorical(probs)
+            labels = dist.sample().view(-1)
+        # n_labels = logits.shape[-1]
+
+        # Reshape logits for convenience
+        logits = logits.view(-1, logits.size(-1))
+
+        # Compute squared gradients
+        model.zero_grad()
+        loss = criterion(logits, labels)
+        loss.backward()
+        squared_grads_batch = [param.grad.detach()**2 for param in model.parameters()]
+
+        # Save unnormalised fisher information values
+        fisher_unnormed = [(x + y) for x, y in zip(fisher_unnormed, squared_grads_batch)]
+        n_batches += 1
+
+    fisher_information_matrix = [(x / n_batches).detach().to('cpu').numpy() for x in fisher_unnormed]
+    return fisher_information_matrix
 
 
 def main():
@@ -626,14 +661,6 @@ def main():
         else None,
     )
 
-
-    # dataloader = trainer.get_test_dataloader(train_dataset)
-    # for batch_id, batch in enumerate(dataloader):
-    #     predictions = model(**(batch))
-    #     logits = predictions.logits[:, :-1].contiguous()
-    #     labels = batch['labels'][:, 1:].contiguous()
-    #     import ipdb; ipdb.set_trace()
-
     # import ipdb; ipdb.set_trace()
 
     # Training
@@ -670,8 +697,11 @@ def main():
         except OverflowError:
             perplexity = float("inf")
         metrics["perplexity"] = perplexity
-
         trainer.log_metrics("eval", metrics)
+
+        fisher_information_matrix = estimate_fisher_information_matrix(trainer, model, eval_dataset)
+        metrics["fisher_information_matrix"] = [x.tolist() for x in fisher_information_matrix]
+
         trainer.save_metrics("eval", metrics)
 
     kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "text-generation"}
