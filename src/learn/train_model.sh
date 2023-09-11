@@ -23,6 +23,13 @@ then
   if [ ! -z "${LANG2}" ] && [ "$MODE" = "sequential" ]
   then
     extra_flags="${extra_flags}  --model_name_or_path checkpoints/${CHECKPOINT}"
+
+
+    if [ "$USE_EWC" = true ]
+    then
+      echo "Train model with elastic weight consolidation"
+      extra_flags="${extra_flags} --do-ewc"
+    fi
   else
     MODEL_NAME=${CHECKPOINT}
     extra_flags="${extra_flags} --resume_from_checkpoint checkpoints/${CHECKPOINT}"
