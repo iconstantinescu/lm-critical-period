@@ -25,6 +25,7 @@ import logging
 import math
 import os
 import sys
+import copy
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import Optional
@@ -41,6 +42,7 @@ from transformers import (
     AutoConfig,
     AutoModelForCausalLM,
     AutoTokenizer,
+    GPT2LMHeadModel,
     HfArgumentParser,
     Trainer,
     TrainingArguments,
@@ -106,6 +108,10 @@ class ModelArguments:
     use_fast_tokenizer: bool = field(
         default=True,
         metadata={"help": "Whether to use one of the fast tokenizer (backed by the tokenizers library) or not."},
+    )
+    use_ewc: bool = field(
+        default=True,
+        metadata={"help": "Whether to use elastic weight consolidation."},
     )
     model_revision: str = field(
         default="main",
@@ -223,6 +229,47 @@ class DataTrainingArguments:
             if self.validation_file is not None:
                 extension = self.validation_file.split(".")[-1]
                 assert extension in ["csv", "json", "txt"], "`validation_file` should be a csv, a json or a txt file."
+
+
+class GPT2WithEWCLoss(GPT2LMHeadModel):
+    def __init__(self, *args, ewc_strength=0.01, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.ewc_strength = ewc_strength
+
+    def save_initial_weights(self):
+        self.initial_params = [x.clone().detach().to(device=self.device) for x in self.parameters()]
+
+    def forward(self, input_ids=None, past_key_values=None,
+                attention_mask=None, token_type_ids=None, position_ids=None,
+                head_mask=None, inputs_embeds=None, labels=None,
+                use_cache=True, **kwargs):
+        outputs = super().forward(
+            input_ids=input_ids,
+            past_key_values=past_key_values,
+            attention_mask=attention_mask,
+            token_type_ids=token_type_ids,
+            position_ids=position_ids,
+            head_mask=head_mask,
+            inputs_embeds=inputs_embeds,
+            labels=labels,
+            use_cache=use_cache,
+            )
+
+        outputs['loss'] += self.ewc_strength * self.get_ewc_loss()
+        return outputs
+
+    def get_ewc_loss(self):
+        device = self.device
+        if self.initial_params[0].device != device:
+            self.initial_params = [x.to(device=device) for x in self.initial_params]
+
+        loss = 0
+        for param, init_param in zip(self.parameters(), self.initial_params):
+            loss = (param - init_param).norm(2)
+
+        # import ipdb; ipdb.set_trace()
+        return loss
 
 
 def main():
@@ -409,7 +456,8 @@ def main():
             if model_args.torch_dtype in ["auto", None]
             else getattr(torch, model_args.torch_dtype)
         )
-        model = AutoModelForCausalLM.from_pretrained(
+        model_class = GPT2WithEWCLoss if model_args.use_ewc else AutoModelForCausalLM
+        model = model_class.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -419,10 +467,15 @@ def main():
             torch_dtype=torch_dtype,
             low_cpu_mem_usage=model_args.low_cpu_mem_usage,
         )
+
+        if model_args.use_ewc:
+            model.save_initial_weights()
     else:
         model = AutoModelForCausalLM.from_config(config)
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
         logger.info(f"Training new model from scratch - Total size={n_params/2**20:.2f}M params")
+
+    # import ipdb; ipdb.set_trace()
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -572,6 +625,16 @@ def main():
         if training_args.do_eval and not is_torch_tpu_available()
         else None,
     )
+
+
+    # dataloader = trainer.get_test_dataloader(train_dataset)
+    # for batch_id, batch in enumerate(dataloader):
+    #     predictions = model(**(batch))
+    #     logits = predictions.logits[:, :-1].contiguous()
+    #     labels = batch['labels'][:, 1:].contiguous()
+    #     import ipdb; ipdb.set_trace()
+
+    # import ipdb; ipdb.set_trace()
 
     # Training
     if training_args.do_train:
