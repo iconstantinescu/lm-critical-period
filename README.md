@@ -83,6 +83,13 @@ $ pip install wandb
 
 ## Running the scripts Locally
 
+First, train the model in lang1 with command:
 ```bash
 $ DO_TEST=true MODE=sequential MODEL=gpt2 CONFIG=config11 DATASET=unified_clean LANG1=fi LANG2=en SEED=7 source src/learn/train_model.sh
+```
+
+And then run to finetune the model in the lang2:
+```bash
+$ MODE=sequential CHECKPOINT=gpt2-config11-fien-sequential-7-1109-2/checkpoint-2500 MODEL=gpt2 DATASET=unified_clean LANG1=fi LANG2=en SE
+ED=7 source src/learn/train_model.sh
 ```
