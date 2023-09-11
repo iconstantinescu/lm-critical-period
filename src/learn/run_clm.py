@@ -26,6 +26,7 @@ import math
 import os
 import sys
 import copy
+import json
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import Optional
@@ -238,8 +239,14 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
 
         self.ewc_strength = ewc_strength
 
-    def save_initial_weights(self):
+    def prepare_ewc_info(self, fdir_fim):
         self.initial_params = [x.clone().detach().to(device=self.device) for x in self.parameters()]
+
+        fname_fim = f'{fdir_fim}/eval_results.json'
+        with open(fname_fim, 'r') as f:
+            eval_results = json.load(f)
+        fisher_information_matrix = eval_results['fisher_information_matrix']
+        self.fisher_information_matrix = [torch.FloatTensor(x) for x in fisher_information_matrix]
 
     def forward(self, input_ids=None, past_key_values=None,
                 attention_mask=None, token_type_ids=None, position_ids=None,
@@ -264,12 +271,12 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
         device = self.device
         if self.initial_params[0].device != device:
             self.initial_params = [x.to(device=device) for x in self.initial_params]
+            self.fisher_information_matrix = [x.to(device=device) for x in self.fisher_information_matrix]
 
         loss = 0
-        for param, init_param in zip(self.parameters(), self.initial_params):
-            loss = (param - init_param).norm(2)
+        for param, init_param, fim_weight in zip(self.parameters(), self.initial_params, self.fisher_information_matrix):
+            loss += (fim_weight * ((param - init_param) ** 2)).sum()
 
-        # import ipdb; ipdb.set_trace()
         return loss
 
 
@@ -504,7 +511,7 @@ def main():
         )
 
         if model_args.use_ewc:
-            model.save_initial_weights()
+            model.prepare_ewc_info(model_args.model_name_or_path)
     else:
         model = AutoModelForCausalLM.from_config(config)
         n_params = sum({p.data_ptr(): p.numel() for p in model.parameters()}.values())
