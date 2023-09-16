@@ -23,7 +23,7 @@ Help()
    echo "m     Training mode: sequential or interleaved. Default: sequential"
    echo "d     Dataset to use. Default: unified_clean"
    echo "t     Path to custom tokenizer"
-   echo "s     Random seed number. Default: 42"
+   echo "s     Random seed number. Default: 0"
    echo "c     Checkpoint path to resume training"
    echo "f     Config file for model (extra flags)"
    echo "T     Run in test/debug mode (fewer samples). Default: false"
