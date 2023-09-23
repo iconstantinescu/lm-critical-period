@@ -64,3 +64,31 @@ Run a sweep:
 
 ```
 
+## Creating environment locally with Conda
+
+First, create a conda environment with
+```bash
+$ conda env create -f util/environment.yml
+```
+Then activate the environment with `source util/activate.sh` and install your appropriate version of [PyTorch](https://pytorch.org/get-started/locally/).
+```bash
+$ conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+$ # conda install pytorch torchvision cpuonly -c pytorch
+$ pip install transformers[torch]
+$ pip install datasets
+$ pip install evaluate
+$ pip install wandb
+```
+
+
+## Running the scripts Locally
+
+First, train the model in lang1 with command:
+```bash
+$ MODE=sequential MODEL=gpt2 CONFIG=config11 DATASET=unified_clean LANG1=fi SEED=7 source src/learn/train_model.sh
+```
+
+And then run to finetune the model in the lang2:
+```bash
+$ MODE=sequential MODEL=gpt2 CONFIG=config11 DATASET=unified_clean LANG1=fi LANG2=en SEED=7 CHECKPOINT=gpt2-config11-fi-sequential-7-1109-1 source src/learn/train_model.sh
+```

@@ -11,17 +11,25 @@ MODEL_NAME="${MODEL}-${CONFIG}-${LANG1}${LANG2}-${MODE}-${SEED}-${DATE}"
 extra_flags=$(<"./src/learn/configs/${MODEL}_${CONFIG}.txt")
 
 # Add extra flags for test training
-if [ $DO_TEST = true ]
+if [ "$DO_TEST" = true ]
 then
+  echo "Running experiment on test mode"
   extra_flags="${extra_flags} --gradient_accumulation_steps 1 --logging_steps 1 --max_eval_samples 120 --max_train_samples 120"
 fi
 
 # Check if we resume training from checkpoint
 if [ ! -z "${CHECKPOINT}" ]
 then
-  if [ ! -z "${LANG2}" ] && [ $MODE = "sequential" ]
+  if [ ! -z "${LANG2}" ] && [ "$MODE" = "sequential" ]
   then
     extra_flags="${extra_flags}  --model_name_or_path checkpoints/${CHECKPOINT}"
+
+
+    if [ "$USE_EWC" = true ]
+    then
+      echo "Train model with elastic weight consolidation"
+      extra_flags="${extra_flags} --use_ewc"
+    fi
   else
     MODEL_NAME=${CHECKPOINT}
     extra_flags="${extra_flags} --resume_from_checkpoint checkpoints/${CHECKPOINT}"
@@ -29,7 +37,7 @@ then
 fi
 
 # Select which model type to train
-case $MODEL in
+case "$MODEL" in
   gpt2)
     application="train_gpt2.sh"
     ;;
@@ -40,7 +48,7 @@ case $MODEL in
 
   *)
     echo -n "unknown model name"
-    exit 1
+    return 1
     ;;
 esac
 
@@ -68,7 +76,7 @@ then
   wandb agent --count 5 ${SWEEP_ID}
 
 else
-  if [ $MODE = "sequential" ]
+  if [ "$MODE" = "sequential" ]
   then
     if [ ! -z "${LANG2}" ]
     then
@@ -88,13 +96,15 @@ else
 
     fi
 
-  elif [ $MODE = "interleaved" ];
+  elif [ "$MODE" = "interleaved" ];
   then
     # Train on interleaved dataset
     export MODEL_NAME="${MODEL_NAME}"
     export DATA_DIR="data/${DATASET}/${LANG1}_${LANG2}"
 
     bash ./src/learn/${application} ${extra_flags}
+  else
+    echo "Invalid MODE selected: ${MODE}."
   fi
 fi
 

@@ -3,7 +3,10 @@
 EXTRA_FLAGS="$@"
 echo $EXTRA_FLAGS
 
-torchrun --nproc_per_node 8 ./src/learn/run_mlm.py \
+# RUN_APPLICATION="python"
+RUN_APPLICATION="torchrun --nproc_per_node 8"
+
+${RUN_APPLICATION} ./src/learn/run_mlm.py \
     --model_type roberta \
     --tokenizer_name "${DATA_DIR}/roberta_tokenizer" \
     --train_file "${DATA_DIR}/raw/train.txt" \
