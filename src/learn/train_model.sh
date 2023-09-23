@@ -28,7 +28,7 @@ then
     if [ "$USE_EWC" = true ]
     then
       echo "Train model with elastic weight consolidation"
-      extra_flags="${extra_flags} --do-ewc"
+      extra_flags="${extra_flags} --use_ewc"
     fi
   else
     MODEL_NAME=${CHECKPOINT}

@@ -3,8 +3,8 @@
 EXTRA_FLAGS="$@"
 echo $EXTRA_FLAGS
 
-RUN_APPLICATION="python"
-# RUN_APPLICATION="torchrun --nproc_per_node 8"
+# RUN_APPLICATION="python"
+RUN_APPLICATION="torchrun --nproc_per_node 8"
 
 ${RUN_APPLICATION} ./src/learn/run_clm.py \
     --model_type gpt2 \
