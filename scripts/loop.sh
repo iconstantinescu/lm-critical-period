@@ -1,12 +1,16 @@
 #!/bin/bash
 
-MODEL_TYPE="roberta"
-LANG="de"
+MODEL=$1
+MODEL_TYPE=$2
+LANG=$3
 
-for model_dir in ./checkpoints/${MODEL_TYPE}-config2*-${LANG}*; do
+for model_dir in ./checkpoints/${MODEL}-config2*-${LANG}*; do
     echo $model_dir
     for checkpoint in $model_dir/checkpoint-*; do
-      echo ${checkpoint#*checkpoints/}
+      CMD="./scripts/evaluate.sh blimp ${checkpoint#*checkpoints/} $MODEL_TYPE"
+      echo $CMD
+      eval $CMD
+      sleep 300
     done
     echo "\n"
 done
