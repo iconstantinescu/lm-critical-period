@@ -64,7 +64,7 @@ def extract_glue_results(files, model_type, lang):
             try:
                 with open(result_file) as f:
                     data = json.load(f)
-                    results_dict[name][task] = data['eval_accuracy']
+                    results_dict[name][task] = round(data['eval_accuracy']*100, 2)
             except FileNotFoundError:
                 results_dict[name][task] = None
 
