@@ -290,7 +290,8 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=100):
 
     for batch in tqdm(dataloader, desc='Estimating Fisher Information Matrix'):
         # Get model predictions
-        predictions = model(**(batch))
+        print(model.device)
+        predictions = model(**(batch.to(model.device)))
         logits = predictions.logits[:, :-1].contiguous()
         with torch.no_grad():
             probs = F.softmax(logits, dim=-1)
