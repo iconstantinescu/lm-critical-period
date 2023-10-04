@@ -10,7 +10,7 @@ for model_dir in ./checkpoints/${MODEL}-config2*-${LANG}*; do
       CMD="./scripts/evaluate.sh blimp ${checkpoint#*checkpoints/} $MODEL_TYPE"
       echo $CMD
       eval $CMD
-      sleep 300
+      sleep 480
     done
     echo "\n"
 done
