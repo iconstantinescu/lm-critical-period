@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#SBATCH --time=23:00:00
+
 MODEL=$1
 MODEL_TYPE=$2
 LANG=$3
