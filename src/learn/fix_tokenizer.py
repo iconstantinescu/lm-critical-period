@@ -4,7 +4,6 @@ import os
 
 
 def fix_tokenizer(path):
-    added_tokens = {}
 
     if os.path.exists(f'{path}/added_tokens.json'):
         f = open(f'{path}/added_tokens.json')
@@ -13,16 +12,26 @@ def fix_tokenizer(path):
         os.remove(f'{path}/added_tokens.json')
         print('Removed added_tokens.json')
 
-    if os.path.exists(f'{path}/vocab.json'):
-        f = open(f'{path}/vocab.json', 'r')
-        vocab = json.load(f)
+        with open(f'{path}/vocab.json', 'r') as f:
+            vocab = json.load(f)
 
-        for (key, value) in added_tokens.items():
-            vocab.update({key:value})
-            print(f'Added {key}:{value} to the vocabulary')
+            for (key, value) in added_tokens.items():
+                vocab.update({key:value})
+                print(f'Added {key}:{value} to the vocabulary')
 
-        out = open(f'{path}/vocab.json', 'w')
-        json.dump(vocab, out)
+            out = open(f'{path}/vocab.json', 'w')
+            json.dump(vocab, out)
+
+        with open(f'{path}/config.json', 'r') as f:
+            config = json.load(f)
+
+            config['eos_token_id'] = added_tokens["<|endoftext|>"]
+            config['bos_token_id'] = added_tokens["<|endoftext|>"]
+            config['pad_token_id'] = added_tokens["<pad>"]
+
+            out = open(f'{path}/config.json', 'w')
+            json.dump(config, out)
+            print(f'Changed model config')
 
 
 if __name__ == "__main__":
