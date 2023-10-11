@@ -12,7 +12,7 @@ def fix_tokenizer(path):
         os.remove(f'{path}/added_tokens.json')
         print('Removed added_tokens.json')
 
-        with open(f'{path}/vocab.json', 'r') as f:
+        with open(f'{path}/vocab.json', 'r', encoding="utf-8") as f:
             vocab = json.load(f)
 
             for (key, value) in added_tokens.items():
@@ -22,7 +22,7 @@ def fix_tokenizer(path):
             out = open(f'{path}/vocab.json', 'w')
             json.dump(vocab, out)
 
-        with open(f'{path}/config.json', 'r') as f:
+        with open(f'{path}/config.json', 'r', encoding="utf-8") as f:
             config = json.load(f)
 
             config['eos_token_id'] = added_tokens["<|endoftext|>"]
