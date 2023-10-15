@@ -285,16 +285,20 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=100):
     dataloader = trainer.get_test_dataloader(dataset)
     criterion = torch.nn.CrossEntropyLoss()
 
-    print(model.device)
-    print(dataloader.pin_memory_device)
+    print(f'Model device: {model.device}')
 
     fisher_unnormed = [0 for _ in model.parameters()]
     n_batches = 0
 
     for batch in tqdm(dataloader, desc='Estimating Fisher Information Matrix'):
         # Get model predictions
+
+        print(f"Batch device: {batch['input_ids'].device}")
+        batch['input_ids'].to(model.device)
+        batch['attention_mask'].to(model.device)
+        batch['labels'].to(model.device)
+
         predictions = model(**(batch))
-        print(batch[0])
         logits = predictions.logits[:, :-1].contiguous()
         with torch.no_grad():
             probs = F.softmax(logits, dim=-1)
