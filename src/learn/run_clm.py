@@ -716,8 +716,10 @@ def main():
         metrics["perplexity"] = perplexity
         trainer.log_metrics("eval", metrics)
 
-        fisher_information_matrix = estimate_fisher_information_matrix(trainer, model, eval_dataset)
-        metrics["fisher_information_matrix"] = [x.tolist() for x in fisher_information_matrix]
+        # do not need to calculate fisher matrix for models already trained with ewc
+        if not model_args.use_ewc:
+            fisher_information_matrix = estimate_fisher_information_matrix(trainer, model, eval_dataset)
+            metrics["fisher_information_matrix"] = [x.tolist() for x in fisher_information_matrix]
 
         trainer.save_metrics("eval", metrics)
 
