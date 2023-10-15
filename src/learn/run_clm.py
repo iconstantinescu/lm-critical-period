@@ -293,14 +293,8 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=100):
     for batch in tqdm(dataloader, desc='Estimating Fisher Information Matrix'):
         # Get model predictions
 
-        print(f"Batch device: {batch['input_ids'].device}")
-        batch['input_ids'].to(model.device)
-        batch['attention_mask'].to(model.device)
-        batch['labels'].to(model.device)
-        print(f"Batch device: {batch['input_ids'].device}")
-        batch['input_ids'] = batch['input_ids'].to(model.device)
-        batch['attention_mask'] = batch['attention_mask'].to(model.device)
-        batch['labels'] = batch['labels'].to(model.device)
+        for key in batch.keys():
+            batch[key] = batch[key].to(model.device)
         print(f"Batch device: {batch['input_ids'].device}")
 
         predictions = model(**(batch))
