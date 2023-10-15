@@ -3,8 +3,10 @@
 EXTRA_FLAGS="$@"
 echo $EXTRA_FLAGS
 
+# RUN_APPLICATION="python"
+RUN_APPLICATION="torchrun --nproc_per_node 4"
 
-python3 ./src/learn/run_clm.py \
+${RUN_APPLICATION} ./src/learn/run_clm.py \
     --model_name_or_path "./checkpoints/${MODEL_NAME}" \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
     --cache_dir "${DATA_DIR}/cache" \
@@ -18,4 +20,5 @@ python3 ./src/learn/run_clm.py \
     --block_size 512 \
     --do_eval \
     --low_cpu_mem_usage \
+    --max_eval_samples 12 \
     ${EXTRA_FLAGS}
