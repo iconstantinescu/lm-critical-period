@@ -35,7 +35,7 @@ Help()
    echo
 }
 
-while getopts "n:1:2:m:d:t:s:c:f:p:w:Th" option; do
+while getopts "n:1:2:m:d:t:s:c:f:p:w:ETh" option; do
   case $option in
     n)
       model="$OPTARG"
