@@ -8,6 +8,7 @@ seed=0
 project_name="critical-period"
 do_sweep=false
 do_test=false
+use_ewc=false
 timestamp=$(date +%s)
 
 Help()
@@ -26,6 +27,7 @@ Help()
    echo "s     Random seed number. Default: 0"
    echo "c     Checkpoint path to resume training"
    echo "f     Config file for model (extra flags)"
+   echo "E     Use elastic weight consolidation. Default: false"
    echo "T     Run in test/debug mode (fewer samples). Default: false"
    echo "p     Project name for wandb logging. Default: critical-period"
    echo "w     Wandb sweep id for hyperparameter tuning (sweep must be started already)"
@@ -69,6 +71,9 @@ while getopts "n:1:2:m:d:t:s:c:f:p:w:Th" option; do
       sweep_id="$OPTARG"
       do_sweep=true
       ;;
+    E)
+      use_ewc=true
+      ;;
     T)
       do_test=true
       project_name="test"
@@ -96,6 +101,7 @@ echo "Checkpoint: $checkpoint"
 echo "Configuration file: $config_file"
 echo "Do test: $do_test"
 echo "Do sweep: $do_sweep"
+echo "Use ewc: $use_ewc"
 echo "Project name: $project_name"
 
 if [ $do_sweep = true ] ;
@@ -116,7 +122,7 @@ then
 else
   echo 'Doing normal training'
   MODEL=${model} DATASET=${dataset} TOKENIZER=${tokenizer} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
-  PROJECT=${project_name} CHECKPOINT=${checkpoint} CONFIG=${config_file} DO_TEST=${do_test} \
+  PROJECT=${project_name} CHECKPOINT=${checkpoint} CONFIG=${config_file} DO_TEST=${do_test} USE_EWC=${use_ewc}\
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
           --output="./logs/trainings/train_${model}_${config_file}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
           scripts/train.euler
