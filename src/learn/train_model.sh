@@ -81,7 +81,14 @@ else
     if [ ! -z "${LANG2}" ]
     then
       # Train second language for sequential mode
-      export MODEL_NAME="${MODEL_NAME}-2"
+
+      if [ "$USE_EWC" = true ]
+      then
+        export MODEL_NAME="${MODEL_NAME}-2-ewc"
+      else
+        export MODEL_NAME="${MODEL_NAME}-2"
+      fi
+
       export DATA_DIR="data/${DATASET}/${LANG2}"
 
       bash ./src/learn/${application} ${extra_flags}
