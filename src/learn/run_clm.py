@@ -295,7 +295,7 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=100):
 
         for key in batch.keys():
             batch[key] = batch[key].to(model.device)
-        print(f"Batch device: {batch['input_ids'].device}")
+        # print(f"Batch device: {batch['input_ids'].device}")
 
         predictions = model(**(batch))
         logits = predictions.logits[:, :-1].contiguous()
