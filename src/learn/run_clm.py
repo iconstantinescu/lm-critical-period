@@ -239,7 +239,7 @@ class DataTrainingArguments:
 
 
 class GPT2WithEWCLoss(GPT2LMHeadModel):
-    def __init__(self, *args, ewc_strength=0.01, **kwargs):
+    def __init__(self, *args, ewc_strength=0.5, **kwargs):
         super().__init__(*args, **kwargs)
         print('Initialized GPT2WithEWCLoss model')
 
@@ -286,7 +286,7 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
         return loss
 
 
-def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=100):
+def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
     dataloader = trainer.get_test_dataloader(dataset)
     criterion = torch.nn.CrossEntropyLoss()
 
