@@ -51,15 +51,15 @@ case $TASK in
     workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
 
     for checkpoint in $workdir/checkpoints/${MODEL}/checkpoint-*; do
-      CMD="scripts/evaluate.sh l1 ${checkpoint#*checkpoints/} ${MODEL_TYPE} ${LANG}"
+      CMD="${workdir}/scripts/evaluate.sh l1 ${checkpoint#*checkpoints/} ${MODEL_TYPE} ${LANG}"
       echo $CMD
-      #eval $CMD
+      eval $CMD
     done
     echo -e "\n"
 
     prefix=""
-    application=""
-    options=""
+    application="echo"
+    options="Started ${LANG} evaluation for each checkpoint of ${MODEL}"
     ;;
 
   *)
@@ -73,16 +73,14 @@ module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
 source $workdir/venv/bin/activate
 
 
-cd $workdir
-echo -e "Changed directory to `pwd`.\n"
-
-
 echo -e "JobID: $SLURM_JOB_ID\n======"
 echo "Time: `date`"
 echo "Running on master node: `hostname`"
 echo "Current directory: `pwd`"
 
+cd $workdir
+echo -e "Changed directory to `pwd`.\n"
 
-CMD="$prefix $workdir/$application $options"
+CMD="$prefix $application $options"
 echo -e "\nExecuting command:\n==================\n$CMD\n"
 eval $CMD
