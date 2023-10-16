@@ -20,5 +20,4 @@ ${RUN_APPLICATION} ./src/learn/run_clm.py \
     --block_size 512 \
     --do_eval \
     --low_cpu_mem_usage \
-    --max_eval_samples 12000 \
     ${EXTRA_FLAGS}

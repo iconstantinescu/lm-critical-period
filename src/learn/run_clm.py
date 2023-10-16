@@ -116,6 +116,10 @@ class ModelArguments:
         default=False,
         metadata={"help": "Whether to use elastic weight consolidation."},
     )
+    estimate_fisher_matrix: bool = field(
+        default=False,
+        metadata={"help": "Whether to calculate the fisher information matrix at the evaluation step."},
+    )
     model_revision: str = field(
         default="main",
         metadata={"help": "The specific model version to use (can be a branch name, tag name or commit id)."},
@@ -717,8 +721,8 @@ def main():
         metrics["perplexity"] = perplexity
         trainer.log_metrics("eval", metrics)
 
-        # calculate fisher matrix when we evaluate only (to avoid unnecessary computations)
-        if not training_args.do_train:
+        # calculate fisher matrix only when asked (to avoid unnecessary computations)
+        if model_args.estimate_fisher_matrix:
             fisher_information_matrix = estimate_fisher_information_matrix(trainer, model, eval_dataset)
             metrics["fisher_information_matrix"] = [x.tolist() for x in fisher_information_matrix]
 

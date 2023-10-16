@@ -37,6 +37,13 @@ case $TASK in
     workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
     prefix="MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
     application="src/learn/eval_${MODEL_TYPE}.sh"
+    options="--estimate_fisher_matrix --max_eval_samples 12000"
+    ;;
+
+  l1)
+    workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
+    prefix="MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
+    application="src/learn/eval_${MODEL_TYPE}.sh"
     options=""
     ;;
 
