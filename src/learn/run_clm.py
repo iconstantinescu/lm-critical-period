@@ -241,7 +241,7 @@ class DataTrainingArguments:
 class GPT2WithEWCLoss(GPT2LMHeadModel):
     def __init__(self, *args, ewc_strength=0.5, **kwargs):
         super().__init__(*args, **kwargs)
-        print('Initialized GPT2WithEWCLoss model')
+        print(f'Initialized GPT2WithEWCLoss model with ewc_strength={ewc_strength}')
 
         self.ewc_strength = ewc_strength
 
