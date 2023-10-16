@@ -4,13 +4,13 @@ EXTRA_FLAGS="$@"
 echo $EXTRA_FLAGS
 
 # RUN_APPLICATION="python"
-RUN_APPLICATION="torchrun --nproc_per_node 4"
+RUN_APPLICATION="torchrun --nproc_per_node 8"
 
 ${RUN_APPLICATION} ./src/learn/run_clm.py \
     --model_name_or_path "./checkpoints/${MODEL_NAME}" \
     --validation_file "${DATA_DIR}/raw/validation.txt" \
     --cache_dir "${DATA_DIR}/cache" \
-    --run_name "eval_${MODEL_NAME}" \
+    --run_name "eval_${LANG}_${MODEL_NAME}" \
     --seed ${SEED} \
     --report_to wandb \
     --output_dir "./checkpoints/${MODEL_NAME}" \

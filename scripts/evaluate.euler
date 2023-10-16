@@ -3,7 +3,7 @@
 #SBATCH -n 1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=16000
-#SBATCH --gpus=4
+#SBATCH --gpus=8
 #SBATCH --gres=gpumem:11264m
 #SBATCH --time=23:00:00
 #SBATCH --open-mode=truncate
@@ -44,6 +44,21 @@ case $TASK in
     workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
     prefix="MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
     application="src/learn/eval_${MODEL_TYPE}.sh"
+    options=""
+    ;;
+
+  l1_all)
+    workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
+
+    for checkpoint in $workdir/checkpoints/${MODEL}/checkpoint-*; do
+      CMD="scripts/evaluate.sh l1 ${checkpoint#*checkpoints/} ${MODEL_TYPE} ${LANG}"
+      echo $CMD
+      #eval $CMD
+    done
+    echo -e "\n"
+
+    prefix=""
+    application=""
     options=""
     ;;
 
