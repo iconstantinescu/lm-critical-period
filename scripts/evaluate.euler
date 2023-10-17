@@ -29,7 +29,7 @@ case $TASK in
   glue)
     workdir="/cluster/work/cotterell/iconstantine/evaluation-pipeline"
     prefix=""
-    application="finetune_all_tasks.sh"
+    application="./finetune_all_tasks.sh"
     options="$modeldir/${MODEL} 5e-5 10 32"
     ;;
 
