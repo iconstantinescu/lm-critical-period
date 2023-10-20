@@ -28,6 +28,20 @@ def get_files(eval_type, model_type, lang, do_checkpoints):
     return matched_files
 
 
+def remap_checkpoints(results_dict):
+    # sort and map checkpoints to epochs
+    sorted_dict = dict(sorted(results_dict.items(),
+                              key=lambda x: (f"{x[0].split('-')[0]}-{x[0].split('-')[1]}", int(x[0].split("-")[-1]))))
+
+    print(sorted_dict.keys())
+    new_dict = {}
+    for i, (key, value) in enumerate(sorted_dict.items()):
+        new_key = f"{key.split('-')[0]}-{key.split('-')[1]}-{i % 6 + 1}"
+        new_dict[new_key] = value
+
+    return new_dict
+
+
 def extract_blimp_results(files, model_type, lang, do_checkpoints):
     results_dict = {}
 
@@ -53,11 +67,12 @@ def extract_blimp_results(files, model_type, lang, do_checkpoints):
 
                 results_dict[name][task] = score
 
-    results_df = pd.DataFrame(results_dict)
-
     name = f'blimp_{model_type}_{lang}'
     if do_checkpoints:
         name += '_checkpoints'
+        results_dict = remap_checkpoints(results_dict)
+
+    results_df = pd.DataFrame(results_dict)
 
     results_df.to_csv(f'./plots/{name}.csv', index_label='task')
 
@@ -80,14 +95,47 @@ def extract_glue_results(files, model_type, lang):
             result_file = os.path.join(checkpoint_dir, f'{task}/eval_results.json')
 
             try:
-                with open(result_file) as f:
-                    data = json.load(f)
-                    results_dict[name][task] = round(data['eval_accuracy']*100, 2)
+                f = open(result_file)
+                data = json.load(f)
+                results_dict[name][task] = round(data['eval_accuracy'] * 100, 2)
             except FileNotFoundError:
                 results_dict[name][task] = None
 
     results_df = pd.DataFrame(results_dict)
     results_df.to_csv(f'./plots/glue_{model_type}_{lang}.csv', index_label='task')
+
+
+def extract_l1_results(files, model_type, lang, do_checkpoints):
+    results_dict = {}
+
+    # we use the 'files' variable to find which models were evaluated
+    # we extract the results from the evaluation files added to the model checkpoints
+
+    for file in sorted(files):
+        checkpoint = file.split('_')[2]
+        checkpoint_dir = os.path.join(f"checkpoints/{checkpoint}")
+
+        split = file.split('-')
+        name = f'c{split[1][-1]}-{split[3]}'
+        if do_checkpoints:
+            name += f'-{split[-1].split("_")[0]}'
+
+        results_dict[name] = {}
+        result_file = os.path.join(checkpoint_dir, f'eval_results.json')
+        try:
+            f = open(result_file)
+            data = json.load(f)
+            results_dict[name] = [data['eval_loss']]
+        except FileNotFoundError:
+            results_dict[name] = None
+
+    name = f'l1_{model_type}_{lang}'
+    if do_checkpoints:
+        name += '_checkpoints'
+        results_dict = remap_checkpoints(results_dict)
+
+    results_df = pd.DataFrame(results_dict)
+    results_df.to_csv(f'./plots/{name}.csv', index=False)
 
 
 if __name__ == '__main__':
@@ -105,3 +153,5 @@ if __name__ == '__main__':
         extract_blimp_results(files, args.model_type, args.lang, args.checkpoints)
     elif args.eval_type == 'glue':
         extract_glue_results(files, args.model_type, args.lang)
+    elif args.eval_type == 'l1':
+        extract_l1_results(files, args.model_type, args.lang, args.checkpoints)
