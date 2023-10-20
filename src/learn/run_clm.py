@@ -114,7 +114,7 @@ class ModelArguments:
     )
     use_ewc: bool = field(
         default=False,
-        metadata={"help": "Whether to use elastic weight consolidation."},
+        metadata={"help": "Whether to use elastic weight consolidation when training."},
     )
     estimate_fisher_matrix: bool = field(
         default=False,

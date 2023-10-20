@@ -25,12 +25,16 @@ import logging
 import math
 import os
 import sys
+import json
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import Optional
 
+from tqdm import tqdm
 import datasets
 import evaluate
+import torch
+from torch.functional import F
 from datasets import load_dataset
 
 import transformers
@@ -40,6 +44,7 @@ from transformers import (
     AutoConfig,
     AutoModelForMaskedLM,
     AutoTokenizer,
+    RobertaForMaskedLM,
     DataCollatorForLanguageModeling,
     HfArgumentParser,
     Trainer,
@@ -102,6 +107,14 @@ class ModelArguments:
     use_fast_tokenizer: bool = field(
         default=True,
         metadata={"help": "Whether to use one of the fast tokenizer (backed by the tokenizers library) or not."},
+    )
+    use_ewc: bool = field(
+        default=False,
+        metadata={"help": "Whether to use elastic weight consolidation when training."},
+    )
+    estimate_fisher_matrix: bool = field(
+        default=False,
+        metadata={"help": "Whether to calculate the fisher information matrix at the evaluation step."},
     )
     model_revision: str = field(
         default="main",
@@ -223,6 +236,97 @@ class DataTrainingArguments:
                 extension = self.validation_file.split(".")[-1]
                 if extension not in ["csv", "json", "txt"]:
                     raise ValueError("`validation_file` should be a csv, a json or a txt file.")
+
+
+class RobertaWithEWCLoss(RobertaForMaskedLM):
+    def __init__(self, *args, ewc_strength=1000, **kwargs):
+        super().__init__(*args, **kwargs)
+        print(f'Initialized RobertaWithEWCLoss model with ewc_strength={ewc_strength}')
+
+        self.ewc_strength = ewc_strength
+
+    def prepare_ewc_info(self, fdir_fim):
+        self.initial_params = [x.clone().detach().to(device=self.device) for x in self.parameters()]
+
+        fname_fim = f'{fdir_fim}/eval_results.json'
+        with open(fname_fim, 'r') as f:
+            eval_results = json.load(f)
+        fisher_information_matrix = eval_results['fisher_information_matrix']
+        self.fisher_information_matrix = [torch.FloatTensor(x) for x in fisher_information_matrix]
+
+    def forward(self, input_ids=None, past_key_values=None,
+                attention_mask=None, token_type_ids=None, position_ids=None,
+                head_mask=None, inputs_embeds=None, labels=None,
+                use_cache=True, **kwargs):
+        outputs = super().forward(
+            input_ids=input_ids,
+            past_key_values=past_key_values,
+            attention_mask=attention_mask,
+            token_type_ids=token_type_ids,
+            position_ids=position_ids,
+            head_mask=head_mask,
+            inputs_embeds=inputs_embeds,
+            labels=labels,
+            use_cache=use_cache,
+            )
+
+        outputs['loss'] += self.ewc_strength * self.get_ewc_loss()
+        return outputs
+
+    def get_ewc_loss(self):
+        device = self.device
+        if self.initial_params[0].device != device:
+            self.initial_params = [x.to(device=device) for x in self.initial_params]
+            self.fisher_information_matrix = [x.to(device=device) for x in self.fisher_information_matrix]
+
+        loss = 0
+        for param, init_param, fim_weight in zip(self.parameters(), self.initial_params, self.fisher_information_matrix):
+            loss += (fim_weight * ((param - init_param) ** 2)).sum()
+
+        return loss
+
+
+def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
+    dataloader = trainer.get_test_dataloader(dataset)
+    criterion = torch.nn.CrossEntropyLoss()
+
+    print(f'Model device: {model.device}')
+
+    fisher_unnormed = [0 for _ in model.parameters()]
+    n_batches = 0
+
+    for batch in tqdm(dataloader, desc='Estimating Fisher Information Matrix'):
+        # Get model predictions
+
+        for key in batch.keys():
+            batch[key] = batch[key].to(model.device)
+        # print(f"Batch device: {batch['input_ids'].device}")
+
+        predictions = model(**(batch))
+        logits = predictions.logits[:, :-1].contiguous()
+        with torch.no_grad():
+            probs = F.softmax(logits, dim=-1)
+            dist = torch.distributions.categorical.Categorical(probs)
+            labels = dist.sample().view(-1)
+        # n_labels = logits.shape[-1]
+
+        # Reshape logits for convenience
+        logits = logits.view(-1, logits.size(-1))
+
+        # Compute squared gradients
+        for sample_id in range(n_samples):
+            model.zero_grad()
+            loss = criterion(logits, labels)
+            # loss.backward()
+            loss.backward(retain_graph=True if n_samples > (sample_id + 1) else False)
+            squared_grads_batch = [param.grad.detach()**2 for param in model.parameters()]
+
+            # Save unnormalised fisher information values
+            fisher_unnormed = [(x + y) for x, y in zip(fisher_unnormed, squared_grads_batch)]
+            n_batches += 1
+
+    fisher_information_matrix = [(x / n_batches).detach().to('cpu').numpy() for x in fisher_unnormed]
+    return fisher_information_matrix
 
 
 def main():
@@ -397,7 +501,8 @@ def main():
         )
 
     if model_args.model_name_or_path:
-        model = AutoModelForMaskedLM.from_pretrained(
+        model_class = RobertaWithEWCLoss if model_args.use_ewc else AutoModelForMaskedLM
+        model = model_class.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -406,6 +511,9 @@ def main():
             use_auth_token=True if model_args.use_auth_token else None,
             low_cpu_mem_usage=model_args.low_cpu_mem_usage,
         )
+
+        if model_args.use_ewc:
+            model.prepare_ewc_info(model_args.model_name_or_path)
     else:
         logger.info("Training new model from scratch")
         model = AutoModelForMaskedLM.from_config(config)
@@ -633,6 +741,12 @@ def main():
         metrics["perplexity"] = perplexity
 
         trainer.log_metrics("eval", metrics)
+
+        # calculate fisher matrix only when asked (to avoid unnecessary computations)
+        if model_args.estimate_fisher_matrix:
+            fisher_information_matrix = estimate_fisher_information_matrix(trainer, model, eval_dataset)
+            metrics["fisher_information_matrix"] = [x.tolist() for x in fisher_information_matrix]
+
         trainer.save_metrics("eval", metrics)
 
     kwargs = {"finetuned_from": model_args.model_name_or_path, "tasks": "fill-mask"}
