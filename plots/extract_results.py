@@ -31,12 +31,12 @@ def get_files(eval_type, model_type, lang, do_checkpoints):
 def remap_checkpoints(results_dict):
     # sort and map checkpoints to epochs
     sorted_dict = dict(sorted(results_dict.items(),
-                              key=lambda x: (f"{x[0].split('-')[0]}-{x[0].split('-')[1]}", int(x[0].split("-")[-1]))))
+                              key=lambda x: ('-'.join(x[0].split('-')[:-1]), int(x[0].split('-')[-1]))))
 
     print(sorted_dict.keys())
     new_dict = {}
     for i, (key, value) in enumerate(sorted_dict.items()):
-        new_key = f"{key.split('-')[0]}-{key.split('-')[1]}-{i % 6 + 1}"
+        new_key = '-'.join(key.split('-')[:-1]) + f'-{i % 6 + 1}'
         new_dict[new_key] = value
 
     return new_dict
