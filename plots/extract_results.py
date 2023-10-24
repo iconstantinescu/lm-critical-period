@@ -50,6 +50,9 @@ def extract_blimp_results(files, model_type, lang, do_checkpoints):
         split = file.split('-')
         name = f'c{split[1][-1]}-{split[3]}'
 
+        if 'ewc' in file:
+            name += '-ewc'
+
         if do_checkpoints:
             name += f'-{split[-1].split("_")[0]}'
 
@@ -89,6 +92,10 @@ def extract_glue_results(files, model_type, lang):
 
         split = file.split('-')
         name = f'c{split[1][-1]}-{split[3]}'
+
+        if 'ewc' in file:
+            name += '-ewc'
+
         results_dict[name] = {}
 
         for task in glue_tasks:
@@ -117,6 +124,10 @@ def extract_l1_results(files, model_type, lang, do_checkpoints):
 
         split = file.split('-')
         name = f'c{split[1][-1]}-{split[3]}'
+
+        if 'ewc' in file:
+            name += '-ewc'
+
         if do_checkpoints:
             name += f'-{split[-1].split("_")[0]}'
 
