@@ -26,6 +26,22 @@ case $TASK in
     options="$modeldir/${MODEL} ${MODEL_TYPE}"
     ;;
 
+  blimp_checkpoints)
+    workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
+
+    for checkpoint in $workdir/checkpoints/${MODEL}/checkpoint-*; do
+      CMD="${workdir}/scripts/evaluate.sh blimp ${checkpoint#*checkpoints/} ${MODEL_TYPE}"
+      echo $CMD
+#      eval $CMD
+#      sleep 480
+    done
+    echo -e "\n"
+
+    prefix=""
+    application="echo"
+    options="Started ${LANG} evaluation for each checkpoint of ${MODEL}"
+    ;;
+
   glue)
     workdir="/cluster/work/cotterell/iconstantine/evaluation-pipeline"
     prefix=""
@@ -47,7 +63,7 @@ case $TASK in
     options=""
     ;;
 
-  l1_all)
+  l1_checkpoints)
     workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
 
     for checkpoint in $workdir/checkpoints/${MODEL}/checkpoint-*; do
