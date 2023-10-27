@@ -30,10 +30,16 @@ case $TASK in
     workdir="/cluster/work/cotterell/iconstantine/lm-critical-period"
 
     for checkpoint in $workdir/checkpoints/${MODEL}/checkpoint-*; do
+      if [ "$MODEL_TYPE" = decoder ]
+      then
+        echo -e "\nFixing tokenizer config for $checkpoint"
+        python3 ./src/learn/fix_tokenizer.py $checkpoint
+      fi
+
       CMD="${workdir}/scripts/evaluate.sh blimp ${checkpoint#*checkpoints/} ${MODEL_TYPE}"
       echo $CMD
-#      eval $CMD
-#      sleep 480
+      eval $CMD
+      sleep 480
     done
     echo -e "\n"
 
