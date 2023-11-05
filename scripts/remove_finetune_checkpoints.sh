@@ -7,7 +7,8 @@ for model_dir in ./checkpoints/*; do
     for task_dir in $model_dir/finetune/*; do
       CMD="rm -r $task_dir/checkpoint*"
       echo $CMD
-      #eval $CMD
+      eval $CMD
+      wait
     done
     echo -e "\n"
 done
