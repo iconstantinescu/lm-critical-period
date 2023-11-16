@@ -49,6 +49,7 @@ from transformers import (
     HfArgumentParser,
     Trainer,
     TrainingArguments,
+    EarlyStoppingCallback,
     default_data_collator,
     is_torch_tpu_available,
     set_seed,
@@ -119,6 +120,11 @@ class ModelArguments:
     estimate_fisher_matrix: bool = field(
         default=False,
         metadata={"help": "Whether to calculate the fisher information matrix at the evaluation step."},
+    )
+    early_stopping: bool = field(
+        default=False,
+        metadata={"help": "Whether to stop the training earlier based on 'metric_for_best_model'. "
+                          "Requires 'load_best_model_at_end' to be True."},
     )
     model_revision: str = field(
         default="main",
@@ -682,6 +688,9 @@ def main():
         if training_args.do_eval and not is_torch_tpu_available()
         else None,
     )
+
+    if model_args.early_stopping:
+        trainer.add_callback(EarlyStoppingCallback(early_stopping_patience=2))
 
     # import ipdb; ipdb.set_trace()
 
