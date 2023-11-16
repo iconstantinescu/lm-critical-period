@@ -1,0 +1,1 @@
+--num_train_epochs 24 --early_stopping --load_best_model_at_end --metric_for_best_model "eval/loss" --learning_rate 1e-3 --warmup_ratio 0.07 --gradient_accumulation_steps 16 --validation_file data/unified_clean/en/raw/validation.txt
