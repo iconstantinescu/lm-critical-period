@@ -287,7 +287,8 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
 
         loss = 0
         for param, init_param, fim_weight in zip(self.parameters(), self.initial_params, self.fisher_information_matrix):
-            loss += (fim_weight * ((param - init_param) ** 2)).sum()
+            #todo: add fim_weight back!!
+            loss += ((param - init_param) ** 2).sum()
 
         return loss
 
