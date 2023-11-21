@@ -2,7 +2,7 @@ import argparse
 import json
 import torch
 import numpy as np
-from transformers import AutoModel
+from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM
 
 
 def load_fim(checkpoint):
@@ -16,10 +16,17 @@ def load_fim(checkpoint):
 
     return fisher_information_matrix
 
+
 def load_model(checkpoint):
     print('Loading model')
-    #model = AutoModel.from_pretrained('gpt2')
-    model = AutoModel.from_pretrained(f'./checkpoints/{checkpoint}')
+
+    model_class = AutoModel
+    if 'gpt2' in checkpoint:
+        model_class = AutoModelForCausalLM
+    elif 'roberta' in checkpoint:
+        model_class = AutoModelForMaskedLM
+
+    model = model_class.from_pretrained(f'./checkpoints/{checkpoint}')
     return model
 
 
@@ -42,11 +49,14 @@ def check_fim(fisher_information_matrix, model):
 
     print(f"Loss: {loss.item()}")
 
+    bad_idx = []
     f_min = torch.tensor(np.inf)
     f_max = torch.tensor(-np.inf)
     f_mean = 0
-    for x in fisher_information_matrix:
-        # print(torch.min(x))
+    for idx, x in enumerate(fisher_information_matrix):
+        if torch.min(x) <= 0:
+            bad_idx.append(idx)
+
         f_min = torch.min(f_min, torch.min(x))
         f_max = torch.max(f_max, torch.max(x))
         f_mean += x.sum()
@@ -54,6 +64,7 @@ def check_fim(fisher_information_matrix, model):
     print(f"Minimum value: {f_min}")
     print(f"Maximum value: {f_max}")
     print(f"Mean value: {f_mean / fim_count}")
+    print(f"Matrix indexes with unwanted values: {bad_idx}")
 
 
 if __name__ == "__main__":
