@@ -276,7 +276,10 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
             use_cache=use_cache,
             )
 
-        outputs['loss'] += self.ewc_strength * self.get_ewc_loss()
+        if self.training:
+            print('Model is in training mode')
+            outputs['loss'] += self.ewc_strength * self.get_ewc_loss()
+
         return outputs
 
     def get_ewc_loss(self):
