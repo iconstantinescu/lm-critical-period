@@ -245,7 +245,7 @@ class DataTrainingArguments:
 
 
 class GPT2WithEWCLoss(GPT2LMHeadModel):
-    def __init__(self, *args, ewc_strength=1000, **kwargs):
+    def __init__(self, *args, ewc_strength=10**8, **kwargs):
         super().__init__(*args, **kwargs)
         print(f'Initialized GPT2WithEWCLoss model with ewc_strength={ewc_strength}')
 
@@ -277,7 +277,6 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
             )
 
         if self.training:
-            print('Model is in training mode')
             outputs['loss'] += self.ewc_strength * self.get_ewc_loss()
 
         return outputs
@@ -290,8 +289,7 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
 
         loss = 0
         for param, init_param, fim_weight in zip(self.parameters(), self.initial_params, self.fisher_information_matrix):
-            #todo: add fim_weight back!!
-            loss += ((param - init_param) ** 2).sum()
+            loss += (fim_weight * ((param - init_param) ** 2)).sum()
 
         return loss
 

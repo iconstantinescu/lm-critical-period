@@ -245,7 +245,7 @@ class DataTrainingArguments:
 
 
 class RobertaWithEWCLoss(RobertaForMaskedLM):
-    def __init__(self, *args, ewc_strength=10000, **kwargs):
+    def __init__(self, *args, ewc_strength=10**8, **kwargs):
         super().__init__(*args, **kwargs)
         print(f'Initialized RobertaWithEWCLoss model with ewc_strength={ewc_strength}')
 
@@ -272,7 +272,9 @@ class RobertaWithEWCLoss(RobertaForMaskedLM):
             labels=labels,
             )
 
-        outputs['loss'] += self.ewc_strength * self.get_ewc_loss()
+        if self.training:
+            outputs['loss'] += self.ewc_strength * self.get_ewc_loss()
+
         return outputs
 
     def get_ewc_loss(self):
