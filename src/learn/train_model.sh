@@ -106,7 +106,14 @@ else
   elif [ "$MODE" = "interleaved" ];
   then
     # Train on interleaved dataset
-    export MODEL_NAME="${MODEL_NAME}"
+
+    if [ ! -z "${CHECKPOINT}" ]
+    then
+      export MODEL_NAME="${MODEL_NAME}-2"
+    else
+      export MODEL_NAME="${MODEL_NAME}"
+    fi
+
     export DATA_DIR="data/${DATASET}/${LANG1}_${LANG2}"
 
     bash ./src/learn/${application} ${extra_flags}
