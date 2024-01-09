@@ -1,1 +1,1 @@
---num_train_epochs 36 --save_strategy steps --save_steps 0.1666 --early_stopping --load_best_model_at_end --metric_for_best_model loss --learning_rate 1e-3 --warmup_ratio 0.07 --gradient_accumulation_steps 16
+--num_train_epochs 36 --save_strategy steps --save_steps 0.1666 --evaluation_strategy steps --eval_steps 0.1666 --early_stopping --load_best_model_at_end --metric_for_best_model loss --learning_rate 1e-3 --warmup_ratio 0.07 --gradient_accumulation_steps 16
