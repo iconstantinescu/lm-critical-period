@@ -42,19 +42,33 @@ def remap_checkpoints(results_dict):
     return new_dict
 
 
+def create_name(checkpoint, do_checkpoints=False):
+    split = checkpoint.split('-')
+    config = 'c' + split[1][-1]
+    condition = split[3]
+    name = f'{config}-{condition}'
+
+    if 'ewc' in checkpoint:
+        name += '-ewc'
+
+    if condition == 'interleaved':
+        if len(split) > 6 and split[6] in {'2', '2/checkpoint'}:
+            name += '2'
+
+    if do_checkpoints:
+        name += f'-{split[-1]}'
+
+    return name
+
+
 def extract_blimp_results(files, model_type, lang, do_checkpoints):
     results_dict = {}
 
     # we extract the results directly from the output logs
     for file in sorted(files):
-        split = file.split('-')
-        name = f'c{split[1][-1]}-{split[3]}'
+        checkpoint = file.split('_')[2]
 
-        if 'ewc' in file:
-            name += '-ewc'
-
-        if do_checkpoints:
-            name += f'-{split[-1].split("_")[0]}'
+        name = create_name(checkpoint, do_checkpoints)
 
         results_dict[name] = {}
 
@@ -90,11 +104,7 @@ def extract_glue_results(files, model_type, lang):
         checkpoint = file.split('_')[2]
         checkpoint_dir = os.path.join(f"checkpoints/{checkpoint}/finetune")
 
-        split = file.split('-')
-        name = f'c{split[1][-1]}-{split[3]}'
-
-        if 'ewc' in file:
-            name += '-ewc'
+        name = create_name(checkpoint)
 
         results_dict[name] = {}
 
@@ -122,14 +132,7 @@ def extract_l1_results(files, model_type, lang, do_checkpoints):
         checkpoint = file.split('_')[2]
         checkpoint_dir = os.path.join(f"checkpoints/{checkpoint}")
 
-        split = file.split('-')
-        name = f'c{split[1][-1]}-{split[3]}'
-
-        if 'ewc' in file:
-            name += '-ewc'
-
-        if do_checkpoints:
-            name += f'-{split[-1].split("_")[0]}'
+        name = create_name(checkpoint, do_checkpoints)
 
         results_dict[name] = {}
         result_file = os.path.join(checkpoint_dir, f'eval_results.json')
