@@ -1,1 +1,1 @@
---num_train_epochs 48 --save_strategy steps --save_steps 0.125 --learning_rate 0.00039 --warmup_ratio 0.05 --gradient_accumulation_steps 32 --mlm_probability 0.3
+--num_train_epochs 48 --save_strategy steps --save_steps 0.125 --learning_rate 0.0003 --warmup_ratio 0.05 --gradient_accumulation_steps 32 --mlm_probability 0.3
