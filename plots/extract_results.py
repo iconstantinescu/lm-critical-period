@@ -44,7 +44,7 @@ def remap_checkpoints(results_dict):
 
 def create_name(checkpoint, do_checkpoints=False):
     split = checkpoint.split('-')
-    config = 'c' + split[1][-1]
+    config = split[1]
     condition = split[3]
     name = f'{config}-{condition}'
 
