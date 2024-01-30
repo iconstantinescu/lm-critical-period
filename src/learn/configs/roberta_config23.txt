@@ -1,1 +1,0 @@
---num_train_epochs 6 --learning_rate 0.00039 --warmup_ratio 0.09 --gradient_accumulation_steps 16 --mlm_probability 0.3 --validation_file data/unified_clean/en/raw/validation.txt
