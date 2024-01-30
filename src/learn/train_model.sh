@@ -116,7 +116,8 @@ else
 
     export DATA_DIR="data/${DATASET}/${LANG1}_${LANG2}"
 
-    bash ./src/learn/${application} ${extra_flags}
+    bash ./src/learn/${application} ${extra_flags} "--validation_file data/${DATASET}/${LANG2}/raw/validation.txt"
+
   else
     echo "Invalid MODE selected: ${MODE}."
   fi
