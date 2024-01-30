@@ -1,6 +1,8 @@
 #!/bin/bash
 
-#SBATCH --time=3:00:00
+#SBATCH --time=1:00:00
+#SBATCH --job-name="clean_checkpoints"
+#SBATCH --output="clean_checkpoints.out"
 
 for model_dir in ./checkpoints/*; do
     echo $model_dir
