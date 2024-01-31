@@ -24,9 +24,8 @@ https://huggingface.co/models?filter=text-generation
 import logging
 import math
 import os
+import pickle
 import sys
-import copy
-import json
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import Optional
@@ -254,11 +253,11 @@ class GPT2WithEWCLoss(GPT2LMHeadModel):
     def prepare_ewc_info(self, fdir_fim):
         self.initial_params = [x.clone().detach().to(device=self.device) for x in self.parameters()]
 
-        fname_fim = f'{fdir_fim}/eval_results.json'
-        with open(fname_fim, 'r') as f:
-            eval_results = json.load(f)
-        fisher_information_matrix = eval_results['fisher_information_matrix']
-        self.fisher_information_matrix = [torch.FloatTensor(x) for x in fisher_information_matrix]
+        fname_fim = f'{fdir_fim}/fisher_matrix.pkl'
+        with open(fname_fim, 'rb') as f:
+            fim_obj = pickle.load(f)
+
+        self.fisher_information_matrix = [torch.FloatTensor(x) for x in fim_obj]
 
     def forward(self, input_ids=None, past_key_values=None,
                 attention_mask=None, token_type_ids=None, position_ids=None,
@@ -315,7 +314,7 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
         with torch.no_grad():
             probs = F.softmax(logits, dim=-1)
             dist = torch.distributions.categorical.Categorical(probs)
-            labels = dist.sample().view(-1)
+            labels = dist.sample().view(-1)  # Why sample here and not int the sampling loop?
         # n_labels = logits.shape[-1]
 
         # Reshape logits for convenience
@@ -325,6 +324,7 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
         for sample_id in range(n_samples):
             model.zero_grad()
             loss = criterion(logits, labels)
+            # Isn't this computing the same thing every time? As logits and labels do not change.
             # loss.backward()
             loss.backward(retain_graph=True if n_samples > (sample_id + 1) else False)
             squared_grads_batch = [param.grad.detach()**2 for param in model.parameters()]
@@ -735,7 +735,10 @@ def main():
         # calculate fisher matrix only when asked (to avoid unnecessary computations)
         if model_args.estimate_fisher_matrix:
             fisher_information_matrix = estimate_fisher_information_matrix(trainer, model, eval_dataset)
-            metrics["fisher_information_matrix"] = [x.tolist() for x in fisher_information_matrix]
+
+            with open(f'{training_args.output_dir}/fisher_matrix.pkl', 'wb') as f:
+                fim_obj = [x.tolist() for x in fisher_information_matrix]
+                pickle.dump(fim_obj, f)
 
         trainer.save_metrics("eval", metrics)
 

@@ -24,8 +24,8 @@ https://huggingface.co/models?filter=fill-mask
 import logging
 import math
 import os
+import pickle
 import sys
-import json
 from dataclasses import dataclass, field
 from itertools import chain
 from typing import Optional
@@ -254,11 +254,11 @@ class RobertaWithEWCLoss(RobertaForMaskedLM):
     def prepare_ewc_info(self, fdir_fim):
         self.initial_params = [x.clone().detach().to(device=self.device) for x in self.parameters()]
 
-        fname_fim = f'{fdir_fim}/eval_results.json'
-        with open(fname_fim, 'r') as f:
-            eval_results = json.load(f)
-        fisher_information_matrix = eval_results['fisher_information_matrix']
-        self.fisher_information_matrix = [torch.FloatTensor(x) for x in fisher_information_matrix]
+        fname_fim = f'{fdir_fim}/fisher_matrix.pkl'
+        with open(fname_fim, 'rb') as f:
+            fim_obj = pickle.load(f)
+
+        self.fisher_information_matrix = [torch.FloatTensor(x) for x in fim_obj]
 
     def forward(self, input_ids=None, attention_mask=None, token_type_ids=None,
                 position_ids=None, head_mask=None, inputs_embeds=None, labels=None, **kwargs):
@@ -752,7 +752,10 @@ def main():
         # calculate fisher matrix only when asked (to avoid unnecessary computations)
         if model_args.estimate_fisher_matrix:
             fisher_information_matrix = estimate_fisher_information_matrix(trainer, model, eval_dataset)
-            metrics["fisher_information_matrix"] = [x.tolist() for x in fisher_information_matrix]
+
+            with open(f'{training_args.output_dir}/fisher_matrix.pkl', 'wb') as f:
+                fim_obj = [x.tolist() for x in fisher_information_matrix]
+                pickle.dump(fim_obj, f)
 
         trainer.save_metrics("eval", metrics)
 

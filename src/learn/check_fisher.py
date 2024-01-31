@@ -1,5 +1,5 @@
 import argparse
-import json
+import pickle
 import torch
 import numpy as np
 from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM
@@ -7,13 +7,11 @@ from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM
 
 def load_fim(checkpoint):
     fname_fim = f'./checkpoints/{checkpoint}/eval_results.json'
-    with open(fname_fim, 'r') as f:
-        print('Loading file')
-        eval_results = json.load(f)
 
-    fisher_information_matrix = eval_results['fisher_information_matrix']
+    print('Loading pickle file')
+    fisher_information_matrix = load_pickle(fname_fim)
+
     fisher_information_matrix = [torch.FloatTensor(x) for x in fisher_information_matrix]
-
     return fisher_information_matrix
 
 
@@ -65,6 +63,17 @@ def check_fim(fisher_information_matrix, model):
     print(f"Maximum value: {f_max}")
     print(f"Mean value: {f_mean / fim_count}")
     print(f"Matrix indexes with unwanted values: {bad_idx}")
+
+
+def save_pickle(obj, filepath):
+    with open(filepath, 'wb') as f:
+        pickle.dump(obj, f)
+
+
+def load_pickle(filepath):
+    with open(filepath, 'rb') as f:
+        obj = pickle.load(f)
+        return obj
 
 
 if __name__ == "__main__":
