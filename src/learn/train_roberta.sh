@@ -23,7 +23,6 @@ ${RUN_APPLICATION} ./src/learn/run_mlm.py \
     --eval_accumulation_steps 64 \
     --max_seq_length 510 \
     --do_train \
-    --weight_decay 0.01 \
     --logging_steps 50 \
     --do_eval \
     --evaluation_strategy "epoch" \

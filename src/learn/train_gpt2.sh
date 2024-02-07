@@ -23,7 +23,6 @@ ${RUN_APPLICATION} ./src/learn/run_clm.py \
     --eval_accumulation_steps 128 \
     --block_size 512 \
     --do_train \
-    --weight_decay 0.01 \
     --logging_steps 50 \
     --do_eval \
     --evaluation_strategy "epoch" \
