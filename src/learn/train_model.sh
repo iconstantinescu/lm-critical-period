@@ -17,22 +17,21 @@ then
   extra_flags="${extra_flags} --gradient_accumulation_steps 1 --logging_steps 1 --max_eval_samples 120 --max_train_samples 120"
 fi
 
-# Check if we resume training from checkpoint
+# Check if we have a checkpoint and if we resume or start a new training
 if [ ! -z "${CHECKPOINT}" ]
 then
-  if [ ! -z "${LANG2}" ]
+  if [ "$RESUME" = true ]
   then
-    extra_flags="${extra_flags}  --model_name_or_path checkpoints/${CHECKPOINT}"
-
+    MODEL_NAME=${CHECKPOINT}
+    extra_flags="${extra_flags} --resume_from_checkpoint checkpoints/${CHECKPOINT}"
+  else
+    extra_flags="${extra_flags} --model_name_or_path checkpoints/${CHECKPOINT}"
 
     if [ "$USE_EWC" = true ]
     then
       echo "Train model with elastic weight consolidation"
       extra_flags="${extra_flags} --use_ewc"
     fi
-  else
-    MODEL_NAME=${CHECKPOINT}
-    extra_flags="${extra_flags} --resume_from_checkpoint checkpoints/${CHECKPOINT}"
   fi
 fi
 

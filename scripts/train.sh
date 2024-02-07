@@ -6,6 +6,7 @@ dataset="unified_clean"
 training_mode="sequential"
 seed=0
 project_name="critical-period"
+resume=false
 do_sweep=false
 do_test=false
 use_ewc=false
@@ -18,14 +19,15 @@ Help()
    echo
    echo "Syntax: train.sh [-n|1|2|m|d|t|s|c|f|T|p|w]"
    echo "options:"
-   echo "n     Model name (gpt2 or roberta). Default: gpt2"
+   echo "n     Model name (gpt2 or roberta) to train from scratch. Default: gpt2"
+   echo "c     The model checkpoint for weights initialization. Don't set if you want to train a model from scratch."
+   echo "r     Resume training from the checkpoint instead of starting a new one"
    echo "1     First language to train on. Default: en"
    echo "2     Second language to train on"
    echo "m     Training mode: sequential or interleaved. Default: sequential"
    echo "d     Dataset to use. Default: unified_clean"
    echo "t     Path to custom tokenizer"
    echo "s     Random seed number. Default: 0"
-   echo "c     Checkpoint path to resume training"
    echo "f     Config file for model (extra flags)"
    echo "E     Use elastic weight consolidation. Default: false"
    echo "T     Run in test/debug mode (fewer samples). Default: false"
@@ -35,10 +37,16 @@ Help()
    echo
 }
 
-while getopts "n:1:2:m:d:t:s:c:f:p:w:ETh" option; do
+while getopts "n:c:1:2:m:d:t:s:f:p:w:rETh" option; do
   case $option in
     n)
       model="$OPTARG"
+      ;;
+    c)
+      checkpoint="$OPTARG"
+      ;;
+    r)
+      resume=true
       ;;
     1)
       lang1="$OPTARG"
@@ -57,9 +65,6 @@ while getopts "n:1:2:m:d:t:s:c:f:p:w:ETh" option; do
       ;;
     s)
       seed="$OPTARG"
-      ;;
-    c)
-      checkpoint="$OPTARG"
       ;;
     f)
       config_file="$OPTARG"
@@ -91,13 +96,14 @@ done
 
 echo
 echo "Model: $model"
+echo "Checkpoint: $checkpoint"
+echo "Resume training: $resume"
 echo "Language 1: $lang1"
 echo "Language 2: $lang2"
 echo "Training mode: $training_mode"
 echo "Dataset: $dataset"
 echo "Custom tokenizer: $tokenizer"
 echo "Seed: $seed"
-echo "Checkpoint: $checkpoint"
 echo "Configuration file: $config_file"
 echo "Do test: $do_test"
 echo "Do sweep: $do_sweep"
@@ -121,8 +127,8 @@ then
 
 else
   echo 'Doing normal training'
-  MODEL=${model} DATASET=${dataset} TOKENIZER=${tokenizer} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} SEED=${seed} \
-  PROJECT=${project_name} CHECKPOINT=${checkpoint} CONFIG=${config_file} DO_TEST=${do_test} USE_EWC=${use_ewc}\
+  MODEL=${model} CHECKPOINT=${checkpoint} RESUME=${resume} DATASET=${dataset} TOKENIZER=${tokenizer} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} \
+  SEED=${seed} CONFIG=${config_file} USE_EWC=${use_ewc} DO_TEST=${do_test} PROJECT=${project_name} \
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
           --output="./logs/trainings/train_${model}_${config_file}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
           scripts/train.euler
