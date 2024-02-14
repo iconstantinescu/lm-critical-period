@@ -6,7 +6,7 @@
 #SBATCH --gpus=8
 #SBATCH --time=118:00:00
 #SBATCH --open-mode=truncate
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-type=ALL
 
 
 #! Work directory (i.e. where the job will run):
