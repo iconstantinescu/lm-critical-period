@@ -80,46 +80,50 @@ else
     if [ ! -z "${LANG2}" ]
     then
       # Train second language for sequential mode
-
       if [ "$USE_EWC" = true ]
       then
-        export MODEL_NAME="${MODEL_NAME}-2-ewc"
+        MODEL_NAME="${MODEL_NAME}-2-ewc"
       else
-        export MODEL_NAME="${MODEL_NAME}-2"
+        MODEL_NAME="${MODEL_NAME}-2"
       fi
 
-      export DATA_DIR="data/${DATASET}/${LANG2}"
-
-      bash ./src/learn/${application} ${extra_flags}
+      DATA_DIR="data/${DATASET}/${LANG2}"
 
     elif [ ! -z "${LANG1}" ]
     then
       # Train first language for sequential mode
-      export MODEL_NAME="${MODEL_NAME}-1"
-      export DATA_DIR=${DATA_DIR}
-
-      bash ./src/learn/${application} ${extra_flags}
-
+      MODEL_NAME="${MODEL_NAME}-1"
+      DATA_DIR=${DATA_DIR}
     fi
 
   elif [ "$MODE" = "interleaved" ];
   then
     # Train on interleaved dataset
-
     if [ ! -z "${CHECKPOINT}" ]
     then
-      export MODEL_NAME="${MODEL_NAME}-2"
+      MODEL_NAME="${MODEL_NAME}-2"
     else
-      export MODEL_NAME="${MODEL_NAME}"
+      MODEL_NAME="${MODEL_NAME}"
     fi
 
-    export DATA_DIR="data/${DATASET}/${LANG1}_${LANG2}"
-
-    bash ./src/learn/${application} ${extra_flags} "--validation_file data/${DATASET}/${LANG2}/raw/validation.txt"
+    DATA_DIR="data/${DATASET}/${LANG1}_${LANG2}"
+    extra_flags="${extra_flags} --validation_file data/${DATASET}/${LANG2}/raw/validation.txt"
 
   else
     echo "Invalid MODE selected: ${MODE}."
+    exit 1
   fi
+
+  if [ ! -z "${ANNOTATION}" ]
+  then
+    MODEL_NAME="${MODEL_NAME}_${ANNOTATION}"
+  fi
+
+  export MODEL_NAME=${MODEL_NAME}
+  export DATA_DIR=${DATA_DIR}
+
+  bash ./src/learn/${application} ${extra_flags}
+
 fi
 
 

@@ -31,13 +31,14 @@ Help()
    echo "f     Config file for model (extra flags)"
    echo "E     Use elastic weight consolidation. Default: false"
    echo "T     Run in test/debug mode (fewer samples). Default: false"
+   echo "a     Extra annotation/note to append to the run name (for tracking experiments)"
    echo "p     Project name for wandb logging. Default: critical-period"
    echo "w     Wandb sweep id for hyperparameter tuning (sweep must be started already)"
 
    echo
 }
 
-while getopts "n:c:1:2:m:d:t:s:f:p:w:rETh" option; do
+while getopts "n:c:1:2:m:d:t:s:f:a:p:w:rETh" option; do
   case $option in
     n)
       model="$OPTARG"
@@ -68,6 +69,9 @@ while getopts "n:c:1:2:m:d:t:s:f:p:w:rETh" option; do
       ;;
     f)
       config_file="$OPTARG"
+      ;;
+    a)
+      annotation="$OPTARG"
       ;;
     p)
       project_name="$OPTARG"
@@ -108,6 +112,7 @@ echo "Configuration file: $config_file"
 echo "Do test: $do_test"
 echo "Do sweep: $do_sweep"
 echo "Use ewc: $use_ewc"
+echo "Annotation: $annotation"
 echo "Project name: $project_name"
 
 if [ $do_sweep = true ] ;
@@ -128,7 +133,7 @@ then
 else
   echo 'Doing normal training'
   MODEL=${model} CHECKPOINT=${checkpoint} RESUME=${resume} DATASET=${dataset} TOKENIZER=${tokenizer} LANG1=${lang1} LANG2=${lang2} MODE=${training_mode} \
-  SEED=${seed} CONFIG=${config_file} USE_EWC=${use_ewc} DO_TEST=${do_test} PROJECT=${project_name} \
+  SEED=${seed} CONFIG=${config_file} USE_EWC=${use_ewc} DO_TEST=${do_test} ANNOTATION=${annotation} PROJECT=${project_name} \
   sbatch  --job-name="lm-train-${model}-${lang1}${lang2}-${training_mode}" \
           --output="./logs/trainings/train_${model}_${config_file}_${lang1}${lang2}_${training_mode}_${seed}_${timestamp}.out" \
           scripts/train.euler
