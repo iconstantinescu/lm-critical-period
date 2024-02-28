@@ -297,7 +297,6 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
     print(f'Model device: {model.device}')
 
     fisher_unnormed = [0 for _ in model.parameters()]
-    n_batches = 0
 
     for batch in tqdm(dataloader, desc='Estimating Fisher Information Matrix'):
         # Get model predictions
@@ -327,9 +326,8 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
 
             # Save unnormalised fisher information values
             fisher_unnormed = [(x + y) for x, y in zip(fisher_unnormed, squared_grads_batch)]
-            n_batches += 1
 
-    fisher_information_matrix = [(x / n_batches).detach().to('cpu').numpy() for x in fisher_unnormed]
+    fisher_information_matrix = [x.detach().to('cpu').numpy() for x in fisher_unnormed]
     return fisher_information_matrix
 
 
