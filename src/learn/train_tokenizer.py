@@ -7,6 +7,7 @@ from transformers import AutoTokenizer
 
 sample = {
     "en": "Hello, y'all! How are you 😁? (just testing the tokenizer)",
+    "en2": "Hello, y'all! How are you 😁? (just testing the tokenizer)",
     "de": "Dafür lassen Sie mich sorgen.--Der Mann, der mein Gut gekauft hat, wohnt in der Stadt.",
     "fi": "Hieno, tuskin huomattava hymyily kiertyi Sinikka-rouvan kapeiden huulten ympärille.",
     "de_en": "Dafür lassen Sie mich sorgen.--Der Mann, der mein Gut gekauft hat, wohnt in der Stadt. "
