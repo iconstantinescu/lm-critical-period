@@ -1,16 +1,20 @@
 #!/bin/bash
 
-#SBATCH -n 1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=16000
-#SBATCH --gpus=8
-#SBATCH --time=2:00:00
+#SBATCH --account=m05
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-core=1
+#SBATCH --cpus-per-task=16
+#SBATCH --partition=normal
+#SBATCH --constraint=gpu
+#SBATCH --time=1:00:00
 #SBATCH --open-mode=truncate
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=iconstantine@student.ethz.ch
 
 
 #! User directory where the projects are located:
-userdir="/cluster/work/cotterell/iconstantine"
+userdir="/iopsstor/scratch/cscs/iconstan"
 
 #! Model directory (i.e. where the model checkpoints are saved):
 modeldir="$userdir/lm-critical-period/checkpoints"
@@ -93,7 +97,7 @@ esac
 
 
 module purge
-module load eth_proxy gcc/8.2.0 python_gpu/3.9.9
+module load cray/default PrgEnv-gnu/8.3.3 cray-python/3.9.13.1
 source $workdir/venv/bin/activate
 
 
