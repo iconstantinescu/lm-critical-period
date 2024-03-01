@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --partition=normal
 #SBATCH --constraint=gpu
-#SBATCH --time=1:00:00
+#SBATCH --time=3:00:00
 #SBATCH --open-mode=truncate
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=iconstantine@student.ethz.ch
