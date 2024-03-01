@@ -6,7 +6,7 @@ from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM
 
 
 def load_fim(checkpoint):
-    fname_fim = f'./checkpoints/{checkpoint}/eval_results.json'
+    fname_fim = f'./checkpoints/{checkpoint}/fisher_matrix.pkl'
 
     print('Loading pickle file')
     fisher_information_matrix = load_pickle(fname_fim)
