@@ -299,19 +299,17 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
     fisher_unnormed = [0 for _ in model.parameters()]
 
     for batch in tqdm(dataloader, desc='Estimating Fisher Information Matrix'):
-        # Get model predictions
 
+        # Move batches to model device
         for key in batch.keys():
             batch[key] = batch[key].to(model.device)
-        # print(f"Batch device: {batch['input_ids'].device}")
 
+        # Get model predictions
         predictions = model(**(batch))
         logits = predictions.logits[:, :-1].contiguous()
         with torch.no_grad():
             probs = F.softmax(logits, dim=-1)
             dist = torch.distributions.categorical.Categorical(probs)
-            labels = dist.sample().view(-1)
-        # n_labels = logits.shape[-1]
 
         # Reshape logits for convenience
         logits = logits.view(-1, logits.size(-1))
@@ -319,15 +317,16 @@ def estimate_fisher_information_matrix(trainer, model, dataset, n_samples=10):
         # Compute squared gradients
         for sample_id in range(n_samples):
             model.zero_grad()
+
+            labels = dist.sample().view(-1)
             loss = criterion(logits, labels)
-            # loss.backward()
             loss.backward(retain_graph=True if n_samples > (sample_id + 1) else False)
             squared_grads_batch = [param.grad.detach()**2 for param in model.parameters()]
 
             # Save unnormalised fisher information values
             fisher_unnormed = [(x + y) for x, y in zip(fisher_unnormed, squared_grads_batch)]
 
-    fisher_information_matrix = [x.detach().to('cpu').numpy() for x in fisher_unnormed]
+    fisher_information_matrix = [(x / n_samples).detach().to('cpu').numpy() for x in fisher_unnormed]
     return fisher_information_matrix
 
 
