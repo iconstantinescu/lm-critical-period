@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup
 
 
 def preprocess(lang):
-    out_file = open(os.path.join(f"preprocessed_data/{lang}wiki.txt"), "w")
-    wiki_dir = os.path.join(f"text_{lang}")
+    out_file = open(os.path.join(f"{lang}.txt"), "w")
+    wiki_dir = os.path.join(lang)
     for d1 in os.listdir(wiki_dir):
         for f in os.listdir(os.path.join(wiki_dir, d1)):
             with open(os.path.join(wiki_dir, d1, f)) as input:

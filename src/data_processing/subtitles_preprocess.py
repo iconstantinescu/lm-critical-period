@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 
 def extract_text(language):
-    out_file = open(os.path.join(f"preprocessed_data/{language}.txt"), "w")
+    out_file = open(os.path.join(f"{language}.txt"), "w")
     dir = os.path.join(language)
 
     print('Start processing the data...')
