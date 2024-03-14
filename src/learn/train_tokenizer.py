@@ -6,14 +6,38 @@ from tokenizers.implementations import ByteLevelBPETokenizer
 from transformers import AutoTokenizer
 
 sample = {
-    "en": "Hello, y'all! How are you 😁? (just testing the tokenizer)",
-    "en2": "Hello, y'all! How are you 😁? (just testing the tokenizer)",
+    "ar": "دعني أعتني بهذا. الرجل الذي اشترى ممتلكاتي يعيش في المدينة.",
     "de": "Dafür lassen Sie mich sorgen.--Der Mann, der mein Gut gekauft hat, wohnt in der Stadt.",
+    "el": "Αφήστε με να το φροντίσω. Ο άνθρωπος που αγόρασε την περιουσία μου μένει στην πόλη.",
+    "en": "Let me take care of that. The man who bought my property lives in the city.",
+    "en2": "Let me take care of that. The man who bought my property lives in the city.",
+    "es": "Déjame encargarme de eso. El hombre que compró mi propiedad vive en la ciudad.",
     "fi": "Hieno, tuskin huomattava hymyily kiertyi Sinikka-rouvan kapeiden huulten ympärille.",
-    "de_en": "Dafür lassen Sie mich sorgen.--Der Mann, der mein Gut gekauft hat, wohnt in der Stadt. "
-             "Hello, y'all! How are you 😁? (just testing the tokenizer)",
-    "fi_en": "Hieno, tuskin huomattava hymyily kiertyi Sinikka-rouvan kapeiden huulten ympärille. "
-             "Hello, y'all! How are you 😁? (just testing the tokenizer)",
+    "ko": "그건 내가 처리하겠습니다. 내 재산을 산 사람은 도시에 살아요.",
+    "nl": "Laat mij daarvoor zorgen. De man die mijn eigendom heeft gekocht, woont in de stad.",
+    "pl": "Pozwól mi się tym zająć. Człowiek, który kupił moją nieruchomość, mieszka w mieście.",
+    "ru": "Позвольте мне позаботиться об этом. Мужчина, который купил мою недвижимость, живет в городе.",
+    "tr": "Bırakın bununla ben ilgileneyim. Benim mülkümü satın alan adam şehirde yaşıyor.",
+    "ar_en": "Let me take care of that. The man who bought my property lives in the city."
+             "دعني أعتني بهذا. الرجل الذي اشترى ممتلكاتي يعيش في المدينة.",
+    "de_en": "Dafür lassen Sie mich sorgen.--Der Mann, der mein Gut gekauft hat, wohnt in der Stadt."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "el_en": "Αφήστε με να το φροντίσω. Ο άνθρωπος που αγόρασε την περιουσία μου μένει στην πόλη."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "es_en": "Déjame encargarme de eso. El hombre que compró mi propiedad vive en la ciudad."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "fi_en": "Hieno, tuskin huomattava hymyily kiertyi Sinikka-rouvan kapeiden huulten ympärille."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "ko_en": "그건 내가 처리하겠습니다. 내 재산을 산 사람은 도시에 살아요."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "nl_en": "Laat mij daarvoor zorgen. De man die mijn eigendom heeft gekocht, woont in de stad."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "pl_en": "Pozwól mi się tym zająć. Człowiek, który kupił moją nieruchomość, mieszka w mieście."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "ru_en": "Позвольте мне позаботиться об этом. Мужчина, который купил мою недвижимость, живет в городе."
+             "Let me take care of that. The man who bought my property lives in the city.",
+    "tr_en": "Bırakın bununla ben ilgileneyim. Benim mülkümü satın alan adam şehirde yaşıyor."
+             "Let me take care of that. The man who bought my property lives in the city.",
 }
 
 
@@ -42,8 +66,9 @@ def train_tokenizer(model, dataset, lang):
     # save the full model tokenizer configuration files
     model_tokenizer.save_pretrained(tokenizer_path)
 
-    output = model_tokenizer.encode_plus(sample[lang])
-    print(output.tokens(), '\n')
+    if lang in sample:
+        output = model_tokenizer.encode_plus(sample[lang])
+        print(output.tokens(), '\n')
 
 
 if __name__ == "__main__":
