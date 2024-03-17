@@ -6,25 +6,43 @@ import itertools as IT
 
 random.seed(42)
 
-DATASETS = ['gutenberg', 'open_subtitles', 'wikipedia']
+# OUTPUT_FOLDER = 'unified_clean'
+OUTPUT_FOLDER = 'unified_extended'
+
+# DATASETS = ['gutenberg', 'open_subtitles', 'wikipedia']
+DATASETS = ['open_subtitles', 'wikipedia']
+
+
+# SAMPLE_RATIOS = {
+#     'en': [0.035, 0.117, 0.048],
+#     'de': [1, 1, 0.160],
+#     'fi': [1, 1, 1]
+# }
 
 SAMPLE_RATIOS = {
-    'en': [0.035, 0.117, 0.048],
-    'de': [1, 1, 0.160],
-    'fi': [1, 1, 1]
+    'ar': [0.169, 0.143],
+    'de': [0.158, 0.034],
+    'el': [0.046, 0.326],
+    'en': [0.016, 0.013],
+    'es': [0.026, 0.039],
+    'fi': [0.136, 0.279],
+    'ko': [1, 0.352],
+    'nl': [0.05, 0.1],
+    'pl': [0.028, 0.109],
+    'ru': [0.140, 0.049],
+    'tr': [0.042, 0.348]
 }
 
 BLOCK_SIZE = 10000
 SPLIT_RATIOS = [0.83, 0.085, 0.085]
 
-DOC = {
-    'en': [],
-    'de': [],
-    'fi': []
-}
+
+DOC = {}
+for key in SAMPLE_RATIOS.keys():
+    DOC[key] = []
 
 
-def train_test_split(doc, folder):
+def train_test_split(doc, lang):
     train_split_idx = math.floor(len(doc) * SPLIT_RATIOS[0])
     valid_split_idx = math.floor(len(doc) * (SPLIT_RATIOS[0] + SPLIT_RATIOS[1]))
 
@@ -32,13 +50,13 @@ def train_test_split(doc, folder):
     valid = doc[train_split_idx:valid_split_idx]
     test = doc[valid_split_idx:]
 
-    if not os.path.exists(f'./data/unified_clean/{folder}/raw'):
-        os.makedirs(f'./data/unified_clean/{folder}/raw')
+    if not os.path.exists(f'./data/{OUTPUT_FOLDER}/{lang}/raw'):
+        os.makedirs(f'./data/{OUTPUT_FOLDER}/{lang}/raw')
 
-    full_out = open(f'./data/unified_clean/{folder}/raw/full.txt', "w")
-    train_out = open(f'./data/unified_clean/{folder}/raw/train.txt', "w")
-    valid_out = open(f'./data/unified_clean/{folder}/raw/validation.txt', "w")
-    test_out = open(f'./data/unified_clean/{folder}/raw/test.txt', "w")
+    full_out = open(f'./data/{OUTPUT_FOLDER}/{lang}/raw/full.txt', "w")
+    train_out = open(f'./data/{OUTPUT_FOLDER}/{lang}/raw/train.txt', "w")
+    valid_out = open(f'./data/{OUTPUT_FOLDER}/{lang}/raw/validation.txt', "w")
+    test_out = open(f'./data/{OUTPUT_FOLDER}/{lang}/raw/test.txt', "w")
 
     full_out.write(''.join(doc))
     train_out.write(''.join(train))
@@ -57,7 +75,7 @@ for lang, ratios in SAMPLE_RATIOS.items():
     for idx, dataset in enumerate(DATASETS):
 
         # count the number of lines in the document
-        with open(f'./data/{dataset}_clean/{lang}.txt') as f:
+        with open(f'./data/{dataset}/{lang}.txt') as f:
             num_lines = sum(1 for _ in f)
 
         # the number of blocks
@@ -69,7 +87,7 @@ for lang, ratios in SAMPLE_RATIOS.items():
         # the blocks we sample (by index)
         sampled_blocks = random.sample(range(0, num_blocks), num_samples // BLOCK_SIZE)
 
-        with open(f'./data/{dataset}_clean/{lang}.txt') as f:
+        with open(f'./data/{dataset}/{lang}.txt') as f:
             block_idx = 0
             samples = []
 
@@ -100,7 +118,8 @@ def evenly_spaced(*iterables):
                 for seq in iterables))]
 
 
-pairs = [('de', 'en'), ('fi', 'en')]
+pairs = [(l1, 'en') for l1 in SAMPLE_RATIOS.keys()]
+print(pairs)
 
 for pair in pairs:
     lang1 = pair[0]
