@@ -30,7 +30,7 @@ SAMPLE_RATIOS = {
     'pl': [0.032, 0.125],
     'ru': [0.154, 0.054],
     'tr': [0.047, 0.383],
-    'java': [0, 0.086]  # add same java.txt to all dirs for simplicity
+    'java': [0, 0.100]  # add same java.txt to all dirs for simplicity
 }
 
 BLOCK_SIZE = 10000
