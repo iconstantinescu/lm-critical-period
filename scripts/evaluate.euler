@@ -39,7 +39,7 @@ case $TASK in
         python3 ./src/learn/fix_tokenizer.py $checkpoint
       fi
 
-      CMD="${workdir}/scripts/evaluate.sh blimp ${checkpoint#*checkpoints/} ${MODEL_TYPE}"
+      CMD="${workdir}/scripts/evaluate.sh blimp ${checkpoint#*${checkpoints_dir}/} ${MODEL_TYPE}"
       echo $CMD
       eval $CMD
       sleep 480
@@ -76,7 +76,7 @@ case $TASK in
     workdir="$userdir/lm-critical-period"
 
     for checkpoint in $modeldir/${MODEL}/checkpoint-*; do
-      CMD="${workdir}/scripts/evaluate.sh l1 ${checkpoint#*checkpoints/} ${MODEL_TYPE} ${LANG}"
+      CMD="${workdir}/scripts/evaluate.sh l1 ${checkpoint#*${checkpoints_dir}/} ${MODEL_TYPE} ${LANG}"
       echo $CMD
       eval $CMD
     done
