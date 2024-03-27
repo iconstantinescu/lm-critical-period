@@ -5,22 +5,23 @@ import os
 import json
 
 glue_tasks = ["cola", "sst2", "mrpc", "qqp", "mnli", "mnli-mm", "qnli", "rte", "boolq", "multirc", "wsc"]
+checkpoints_dirname = 'checkpoints'
 
 
-def get_files(eval_type, model_type, lang, do_checkpoints):
+def get_files(eval_type, model_type, l1, l2, do_checkpoints):
     matched_files = []
     path = f'./logs/evaluations/{model_type}/{eval_type}'
 
     if do_checkpoints:
         for dir in os.listdir(path):
             dir_path = os.path.join(path, dir)
-            if os.path.isdir(dir_path) and f'-{lang}en-' in dir:
+            if os.path.isdir(dir_path) and f'-{l1}{l2}-' in dir:
                 pattern = f'checkpoint-*.out'
                 for name in os.listdir(dir_path):
                     if fnmatch.fnmatch(name, pattern):
                         matched_files.append(os.path.join(dir_path, name))
     else:
-        pattern = f'evaluate_{eval_type}_{model_type}-*-{lang}*.out'
+        pattern = f'evaluate_{eval_type}_{model_type}-*-{l1}{l2}*.out'
         for name in os.listdir(path):
             if fnmatch.fnmatch(name, pattern):
                 matched_files.append(os.path.join(path, name))
@@ -61,7 +62,7 @@ def create_name(checkpoint, do_checkpoints=False):
     return name
 
 
-def extract_blimp_results(files, model_type, lang, do_checkpoints):
+def extract_blimp_results(files, model_type, l1, l2, do_checkpoints):
     results_dict = {}
 
     # we extract the results directly from the output logs
@@ -84,7 +85,7 @@ def extract_blimp_results(files, model_type, lang, do_checkpoints):
 
                 results_dict[name][task] = score
 
-    name = f'blimp_{model_type}_{lang}'
+    name = f'blimp_{model_type}_{l1}{l2}'
     if do_checkpoints:
         name += '_checkpoints'
         results_dict = remap_checkpoints(results_dict)
@@ -94,7 +95,7 @@ def extract_blimp_results(files, model_type, lang, do_checkpoints):
     results_df.to_csv(f'./plots/{name}.csv', index_label='task')
 
 
-def extract_glue_results(files, model_type, lang):
+def extract_glue_results(files, model_type, l1, l2):
     results_dict = {}
 
     # we use the 'files' variable to find which models were evaluated
@@ -102,7 +103,7 @@ def extract_glue_results(files, model_type, lang):
 
     for file in sorted(files):
         checkpoint = file.split('_')[2]
-        checkpoint_dir = os.path.join(f"checkpoints/{checkpoint}/finetune")
+        checkpoint_dir = os.path.join(f"{checkpoints_dirname}/{checkpoint}/finetune")
 
         name = create_name(checkpoint)
 
@@ -119,10 +120,10 @@ def extract_glue_results(files, model_type, lang):
                 results_dict[name][task] = None
 
     results_df = pd.DataFrame(results_dict)
-    results_df.to_csv(f'./plots/glue_{model_type}_{lang}.csv', index_label='task')
+    results_df.to_csv(f'./plots/glue_{model_type}_{l1}{l2}.csv', index_label='task')
 
 
-def extract_l1_results(files, model_type, lang, do_checkpoints):
+def extract_l1_results(files, model_type, l1, l2, do_checkpoints):
     results_dict = {}
 
     # we use the 'files' variable to find which models were evaluated
@@ -130,7 +131,7 @@ def extract_l1_results(files, model_type, lang, do_checkpoints):
 
     for file in sorted(files):
         checkpoint = file.split('_')[2]
-        checkpoint_dir = os.path.join(f"checkpoints/{checkpoint}")
+        checkpoint_dir = os.path.join(f"{checkpoints_dirname}/{checkpoint}")
 
         name = create_name(checkpoint, do_checkpoints)
 
@@ -143,7 +144,7 @@ def extract_l1_results(files, model_type, lang, do_checkpoints):
         except FileNotFoundError:
             results_dict[name] = None
 
-    name = f'l1_{model_type}_{lang}'
+    name = f'l1_{model_type}_{l1}{l2}'
     if do_checkpoints:
         name += '_checkpoints'
         results_dict = remap_checkpoints(results_dict)
@@ -156,16 +157,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--eval_type", type=str)
     parser.add_argument("-m", "--model_type", type=str)
-    parser.add_argument("-l", "--lang", type=str)
+    parser.add_argument("-l1", "--lang1", type=str)
+    parser.add_argument("-l2", "--lang2", type=str, default='en')
     parser.add_argument("-c", "--checkpoints", action='store_true', default=False,
                         help="Extract results from the checkpoints evaluation")
     args = parser.parse_args()
 
-    files = get_files(args.eval_type, args.model_type, args.lang, args.checkpoints)
+    files = get_files(args.eval_type, args.model_type, args.lang1, args.lang2, args.checkpoints)
 
     if args.eval_type == 'blimp':
-        extract_blimp_results(files, args.model_type, args.lang, args.checkpoints)
+        extract_blimp_results(files, args.model_type, args.lang1, args.lang2, args.checkpoints)
     elif args.eval_type == 'glue':
-        extract_glue_results(files, args.model_type, args.lang)
+        extract_glue_results(files, args.model_type, args.lang1, args.lang2)
     elif args.eval_type == 'l1':
-        extract_l1_results(files, args.model_type, args.lang, args.checkpoints)
+        extract_l1_results(files, args.model_type, args.lang1, args.lang2, args.checkpoints)
