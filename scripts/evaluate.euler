@@ -13,8 +13,8 @@
 userdir="/cluster/work/cotterell/iconstantine"
 
 #! Model directory (i.e. where the model checkpoints are saved):
-checkpoints_dir="checkpoints"
-modeldir="$userdir/lm-critical-period/${checkpoints_dir}"
+checkpoints_dirname="checkpoints"
+modeldir="$userdir/lm-critical-period/${checkpoints_dirname}"
 
 export WANDB_PROJECT="evaluation"
 export WANDB__SERVICE_WAIT=300
@@ -39,7 +39,7 @@ case $TASK in
         python3 ./src/learn/fix_tokenizer.py $checkpoint
       fi
 
-      CMD="${workdir}/scripts/evaluate.sh blimp ${checkpoint#*${checkpoints_dir}/} ${MODEL_TYPE}"
+      CMD="${workdir}/scripts/evaluate.sh blimp ${checkpoint#*${checkpoints_dirname}/} ${MODEL_TYPE}"
       echo $CMD
       eval $CMD
       sleep 480
@@ -60,14 +60,14 @@ case $TASK in
 
   fisher)
     workdir="$userdir/lm-critical-period"
-    prefix="CHECKPOINTS_DIR=${checkpoints_dir} MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
+    prefix="CHECKPOINTS_DIR=${checkpoints_dirname} MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
     application="src/learn/eval_${MODEL_TYPE}.sh"
     options="--estimate_fisher_matrix"
     ;;
 
   l1)
     workdir="$userdir/lm-critical-period"
-    prefix="CHECKPOINTS_DIR=${checkpoints_dir} MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
+    prefix="CHECKPOINTS_DIR=${checkpoints_dirname} MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
     application="src/learn/eval_${MODEL_TYPE}.sh"
     options=""
     ;;
@@ -76,7 +76,7 @@ case $TASK in
     workdir="$userdir/lm-critical-period"
 
     for checkpoint in $modeldir/${MODEL}/checkpoint-*; do
-      CMD="${workdir}/scripts/evaluate.sh l1 ${checkpoint#*${checkpoints_dir}/} ${MODEL_TYPE} ${LANG}"
+      CMD="${workdir}/scripts/evaluate.sh l1 ${checkpoint#*${checkpoints_dirname}/} ${MODEL_TYPE} ${LANG}"
       echo $CMD
       eval $CMD
     done
