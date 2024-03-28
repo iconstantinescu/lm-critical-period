@@ -36,15 +36,17 @@ def remap_checkpoints(results_dict):
 
     print(sorted_dict.keys())
     new_dict = {}
-    for i, (key, value) in enumerate(sorted_dict.items()):
 
-        if 'c4' in key:
-            mod = 8
-        else:
-            mod = 6
-
-        new_key = '-'.join(key.split('-')[:-1]) + f'-{i % mod + 1}'
+    i = 1
+    for (key, value) in sorted_dict.items():
+        new_key = '-'.join(key.split('-')[:-1]) + f'-{i}'
         new_dict[new_key] = value
+
+        i += 1
+        if 'c4' in key and i == 9:
+            i = 1
+        elif i == 7:
+            i = 1
 
     return new_dict
 
