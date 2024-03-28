@@ -45,7 +45,7 @@ def remap_checkpoints(results_dict):
         i += 1
         if 'c4' in key and i == 9:
             i = 1
-        elif i == 7:
+        elif 'c4' not in key and i == 7:
             i = 1
 
     return new_dict
