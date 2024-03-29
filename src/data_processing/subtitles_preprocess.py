@@ -1,6 +1,6 @@
 import argparse
 import os
-import re
+import regex
 import time
 
 from bs4 import BeautifulSoup
@@ -27,13 +27,13 @@ def extract_text(language):
                     meta_tag.decompose()
 
                     text = soup.get_text()
-                    text = re.sub(r"- ", "", text)  # remove dialogue line
-                    text = re.sub(r"(\u266A)+", "", text)  # remove song character
-                    text = re.sub(r"[\[(](.*)[\])]", "", text)  # remove [] ()
+                    text = regex.sub(r"- ", "", text)  # remove dialogue line
+                    text = regex.sub(r"(\u266A)+", "", text)  # remove song character
+                    text = regex.sub(r"[\[(](.*)[\])]", "", text)  # remove [] ()
 
-                    text = re.sub(r"\x20\x20+", " ", text)  # remove extra spaces
-                    text = re.sub(r"\x0a\x20+", "", text)  # remove leading spaces
-                    text = re.sub(r"(\u00a0)+", " ", text)  # remove non-breaking spaces
+                    text = regex.sub(r"\x20\x20+", " ", text)  # remove extra spaces
+                    text = regex.sub(r"\x0a\x20+", "", text)  # remove leading spaces
+                    text = regex.sub(r"(\u00a0)+", " ", text)  # remove non-breaking spaces
 
                     text = os.linesep.join(
                         [
@@ -43,7 +43,6 @@ def extract_text(language):
                     )
 
                     out_file.write(text)
-
 
     end_time = time.time()
     print('Elapsed time during the processing in seconds:', end_time - start_time)

@@ -1,11 +1,10 @@
 import pandas as pd
 from collections import defaultdict
 import os
-import re
+import regex
 
 
 def preprocess_file(filename):
-
     with open(f'./data/text/{filename}') as input:
 
         doc = []
@@ -18,13 +17,13 @@ def preprocess_file(filename):
                     doc.append(" ".join(paragraph))
                 paragraph = []
 
-
         text = os.linesep.join(doc)
-        text = re.sub(r"(\u00a0)+", " ", text)  # remove non-breaking spaces
-        text = re.sub(r"\*\s*", "", text)  # remove * delimiters
-        text = re.sub(r"\x20\x20+", " ", text)  # remove extra spaces
+        text = regex.sub(r"(\u00a0)+", " ", text)  # remove non-breaking spaces
+        text = regex.sub(r"\*\s*", "", text)  # remove * delimiters
+        text = regex.sub(r"\x20\x20+", " ", text)  # remove extra spaces
 
         return text
+
 
 filepath = './metadata/metadata.csv'
 metadata_df = pd.read_csv(filepath)
@@ -57,4 +56,3 @@ for lang in languages:
 
     out_file.close()
     print(f'Processed {count} files for the {lang} language\n')
-

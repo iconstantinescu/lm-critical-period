@@ -1,5 +1,5 @@
 import os
-import re
+import regex
 import argparse
 
 from bs4 import BeautifulSoup
@@ -17,8 +17,8 @@ def preprocess(lang):
 
                 text = soup.get_text()
 
-                text = re.sub(r"(\u00a0)+", " ", text)  # remove non-breaking spaces
-                text = re.sub(r"\x20\x20+", " ", text)  # remove extra spaces
+                text = regex.sub(r"(\u00a0)+", " ", text)  # remove non-breaking spaces
+                text = regex.sub(r"\x20\x20+", " ", text)  # remove extra spaces
 
                 text = os.linesep.join(
                     [

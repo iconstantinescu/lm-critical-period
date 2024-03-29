@@ -2,7 +2,7 @@ import argparse
 
 from datasets import load_dataset
 import os
-import re
+import regex
 
 
 def get_data(lang):
@@ -10,13 +10,13 @@ def get_data(lang):
 
     i = 0
     code_lines = []
-    sample_size = 10**4
+    sample_size = 10**6
 
     for sample in iter(ds.take(sample_size)):
         code_string = sample['content']
 
-        code_string = re.sub(r"//(.?)+", "", code_string)  # remove  "//" comments
-        code_string = re.sub(r"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", "", code_string)  # remove "/* */" comments
+        code_string = regex.sub(r"//(.?)+", "", code_string)  # remove  "//" comments
+        code_string = regex.sub(r"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", "", code_string)  # remove "/* */" comments
 
         code_lines.append(' '.join([line.strip() for line in code_string.splitlines() if line]))
 
