@@ -18,7 +18,7 @@ def get_data(lang):
         code_string = regex.sub(r"//(.?)+", "", code_string)  # remove  "//" comments
         code_string = regex.sub(r"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", "", code_string)  # remove "/* */" comments
 
-        code_lines.append(' '.join([line.strip() for line in code_string.splitlines() if line]))
+        code_lines.extend([line.strip() for line in code_string.splitlines() if line.strip()])
 
         if i % (sample_size / 10) == 0:
             print(i // (sample_size // 10))
