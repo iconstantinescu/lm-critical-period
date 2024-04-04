@@ -13,8 +13,11 @@
 userdir="/cluster/work/cotterell/iconstantine"
 
 #! Model directory (i.e. where the model checkpoints are saved):
+data_dirname="unified_clean"
 checkpoints_dirname="checkpoints"
 modeldir="$userdir/lm-critical-period/${checkpoints_dirname}"
+
+
 
 export WANDB_PROJECT="evaluation"
 export WANDB__SERVICE_WAIT=300
@@ -60,14 +63,14 @@ case $TASK in
 
   fisher)
     workdir="$userdir/lm-critical-period"
-    prefix="CHECKPOINTS_DIR=${checkpoints_dirname} MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
+    prefix="CHECKPOINTS_DIR=${checkpoints_dirname} MODEL_NAME=${MODEL} DATA_DIR=data/${data_dirname}/${LANG}  SEED=42"
     application="src/learn/eval_${MODEL_TYPE}.sh"
     options="--estimate_fisher_matrix"
     ;;
 
   l1)
     workdir="$userdir/lm-critical-period"
-    prefix="CHECKPOINTS_DIR=${checkpoints_dirname} MODEL_NAME=${MODEL} DATA_DIR=data/unified_clean/${LANG}  SEED=42"
+    prefix="CHECKPOINTS_DIR=${checkpoints_dirname} MODEL_NAME=${MODEL} DATA_DIR=data/${data_dirname}/${LANG}  SEED=42"
     application="src/learn/eval_${MODEL_TYPE}.sh"
     options=""
     ;;
