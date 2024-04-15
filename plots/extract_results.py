@@ -74,7 +74,7 @@ def extract_blimp_results(files, model_type, l1, l2, checkpoints_dirname, do_che
 
     # we extract the results directly from the output logs
     for file in sorted(files):
-        checkpoint = file.split('/')[6].split('_')[2]
+        checkpoint = file.split('_')[2]
 
         name = create_name(checkpoint, do_checkpoints)
 
@@ -109,7 +109,7 @@ def extract_glue_results(files, model_type, l1, l2, checkpoints_dirname):
     # we extract the results from the evaluation files added to the model checkpoints
 
     for file in sorted(files):
-        checkpoint = file.split('/')[6].split('_')[2]
+        checkpoint = file.split('_')[2]
         checkpoint_dir = os.path.join(f"{checkpoints_dirname}/{checkpoint}/finetune")
 
         name = create_name(checkpoint)
@@ -137,7 +137,7 @@ def extract_l1_results(files, model_type, l1, l2, checkpoints_dirname, do_checkp
     # we extract the results from the evaluation files added to the model checkpoints
 
     for file in sorted(files):
-        checkpoint = file.split('/')[6].split('_')[2]
+        checkpoint = file.split('_')[2]
         checkpoint_dir = os.path.join(f"{checkpoints_dirname}/{checkpoint}")
 
         name = create_name(checkpoint, do_checkpoints)
