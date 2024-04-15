@@ -5,12 +5,11 @@ import os
 import json
 
 glue_tasks = ["cola", "sst2", "mrpc", "qqp", "mnli", "mnli-mm", "qnli", "rte", "boolq", "multirc", "wsc"]
-checkpoints_dirname = 'checkpoints'
 
 
-def get_files(eval_type, model_type, l1, l2, do_checkpoints):
+def get_files(eval_type, model_type, l1, l2, checkpoints_dirname, do_checkpoints):
     matched_files = []
-    path = f'./logs/evaluations/{model_type}/{eval_type}'
+    path = f'./logs/evaluations/{model_type}/{eval_type}/{checkpoints_dirname}'
 
     if do_checkpoints:
         for dir in os.listdir(path):
@@ -70,7 +69,7 @@ def create_name(checkpoint, do_checkpoints=False):
     return name
 
 
-def extract_blimp_results(files, model_type, l1, l2, do_checkpoints):
+def extract_blimp_results(files, model_type, l1, l2, checkpoints_dirname, do_checkpoints):
     results_dict = {}
 
     # we extract the results directly from the output logs
@@ -93,9 +92,9 @@ def extract_blimp_results(files, model_type, l1, l2, do_checkpoints):
 
                 results_dict[name][task] = score
 
-    name = f'blimp_{model_type}_{l1}{l2}'
+    name = f'{checkpoints_dirname}_blimp_{model_type}_{l1}{l2}'
     if do_checkpoints:
-        name += '_checkpoints'
+        name += '_ckpts'
         results_dict = remap_checkpoints(results_dict)
 
     results_df = pd.DataFrame(results_dict)
@@ -103,7 +102,7 @@ def extract_blimp_results(files, model_type, l1, l2, do_checkpoints):
     results_df.to_csv(f'./plots/{name}.csv', index_label='task')
 
 
-def extract_glue_results(files, model_type, l1, l2):
+def extract_glue_results(files, model_type, l1, l2, checkpoints_dirname):
     results_dict = {}
 
     # we use the 'files' variable to find which models were evaluated
@@ -128,10 +127,10 @@ def extract_glue_results(files, model_type, l1, l2):
                 results_dict[name][task] = None
 
     results_df = pd.DataFrame(results_dict)
-    results_df.to_csv(f'./plots/glue_{model_type}_{l1}{l2}.csv', index_label='task')
+    results_df.to_csv(f'./plots/{checkpoints_dirname}_glue_{model_type}_{l1}{l2}.csv', index_label='task')
 
 
-def extract_l1_results(files, model_type, l1, l2, do_checkpoints):
+def extract_l1_results(files, model_type, l1, l2, checkpoints_dirname, do_checkpoints):
     results_dict = {}
 
     # we use the 'files' variable to find which models were evaluated
@@ -152,9 +151,9 @@ def extract_l1_results(files, model_type, l1, l2, do_checkpoints):
         except FileNotFoundError:
             results_dict[name] = None
 
-    name = f'l1_{model_type}_{l1}{l2}'
+    name = f'{checkpoints_dirname}_l1_{model_type}_{l1}{l2}'
     if do_checkpoints:
-        name += '_checkpoints'
+        name += '_ckpts'
         results_dict = remap_checkpoints(results_dict)
 
     results_df = pd.DataFrame(results_dict)
@@ -167,15 +166,18 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--model_type", type=str)
     parser.add_argument("-l1", "--lang1", type=str)
     parser.add_argument("-l2", "--lang2", type=str, default='en')
-    parser.add_argument("-c", "--checkpoints", action='store_true', default=False,
-                        help="Extract results from the checkpoints evaluation")
+    parser.add_argument("-d", "--dirname", type=str, default='checkpoints',
+                        help="Name of directory containing the evaluated checkpoints")
+    parser.add_argument("-c", "--do_checkpoints", action='store_true', default=False,
+                        help="Extract results for each model checkpoint evaluation")
+
     args = parser.parse_args()
 
-    files = get_files(args.eval_type, args.model_type, args.lang1, args.lang2, args.checkpoints)
+    files = get_files(args.eval_type, args.model_type, args.lang1, args.lang2, args.dirname, args.do_checkpoints)
 
     if args.eval_type == 'blimp':
-        extract_blimp_results(files, args.model_type, args.lang1, args.lang2, args.checkpoints)
+        extract_blimp_results(files, args.model_type, args.lang1, args.lang2, args.dirname, args.do_checkpoints)
     elif args.eval_type == 'glue':
-        extract_glue_results(files, args.model_type, args.lang1, args.lang2)
+        extract_glue_results(files, args.model_type, args.lang1, args.lang2, args.dirname)
     elif args.eval_type == 'l1':
-        extract_l1_results(files, args.model_type, args.lang1, args.lang2, args.checkpoints)
+        extract_l1_results(files, args.model_type, args.lang1, args.lang2, args.dirname, args.do_checkpoints)
