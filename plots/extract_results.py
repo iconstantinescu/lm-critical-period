@@ -92,14 +92,16 @@ def extract_blimp_results(files, model_type, l1, l2, checkpoints_dirname, do_che
 
                 results_dict[name][task] = score
 
-    name = f'{checkpoints_dirname}_blimp_{model_type}_{l1}{l2}'
+    name = f'blimp_{model_type}_{l1}{l2}'
     if do_checkpoints:
         name += '_ckpts'
         results_dict = remap_checkpoints(results_dict)
 
-    results_df = pd.DataFrame(results_dict)
+    if not os.path.exists(f'./plots/{checkpoints_dirname}'):
+        os.makedirs(f'./plots/{checkpoints_dirname}')
 
-    results_df.to_csv(f'./plots/{name}.csv', index_label='task')
+    results_df = pd.DataFrame(results_dict)
+    results_df.to_csv(f'./plots/{checkpoints_dirname}/{name}.csv', index_label='task')
 
 
 def extract_glue_results(files, model_type, l1, l2, checkpoints_dirname):
@@ -126,8 +128,13 @@ def extract_glue_results(files, model_type, l1, l2, checkpoints_dirname):
             except FileNotFoundError:
                 results_dict[name][task] = None
 
+    name = f'glue_{model_type}_{l1}{l2}'
+
+    if not os.path.exists(f'./plots/{checkpoints_dirname}'):
+        os.makedirs(f'./plots/{checkpoints_dirname}')
+
     results_df = pd.DataFrame(results_dict)
-    results_df.to_csv(f'./plots/{checkpoints_dirname}_glue_{model_type}_{l1}{l2}.csv', index_label='task')
+    results_df.to_csv(f'./plots/{checkpoints_dirname}/{name}.csv', index_label='task')
 
 
 def extract_l1_results(files, model_type, l1, l2, checkpoints_dirname, do_checkpoints):
@@ -151,13 +158,16 @@ def extract_l1_results(files, model_type, l1, l2, checkpoints_dirname, do_checkp
         except FileNotFoundError:
             results_dict[name] = None
 
-    name = f'{checkpoints_dirname}_l1_{model_type}_{l1}{l2}'
+    name = f'l1_{model_type}_{l1}{l2}'
     if do_checkpoints:
         name += '_ckpts'
         results_dict = remap_checkpoints(results_dict)
 
+    if not os.path.exists(f'./plots/{checkpoints_dirname}'):
+        os.makedirs(f'./plots/{checkpoints_dirname}')
+
     results_df = pd.DataFrame(results_dict)
-    results_df.to_csv(f'./plots/{name}.csv', index=False)
+    results_df.to_csv(f'./plots/{checkpoints_dirname}/{name}.csv', index=False)
 
 
 if __name__ == '__main__':
