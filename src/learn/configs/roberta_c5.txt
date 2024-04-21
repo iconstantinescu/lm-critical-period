@@ -1,1 +1,1 @@
---num_train_epochs 6 --learning_rate 0.000475 --warmup_ratio 0.05 --gradient_accumulation_steps 1 --mlm_probability 0.3
+--num_train_epochs 6 --learning_rate 0.0004 --warmup_ratio 0.01 --gradient_accumulation_steps 1 --mlm_probability 0.3
