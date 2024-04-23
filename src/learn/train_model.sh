@@ -116,7 +116,7 @@ else
 
   if [ ! -z "${ANNOTATION}" ]
   then
-    MODEL_NAME="${MODEL_NAME}_${ANNOTATION}"
+    MODEL_NAME="${MODEL_NAME}-${ANNOTATION}"
   fi
 
   export MODEL_NAME=${MODEL_NAME}
