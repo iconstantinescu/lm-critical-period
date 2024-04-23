@@ -56,8 +56,9 @@ def create_name(checkpoint, do_checkpoints=False):
     condition = split[3]
     name = f'{config}-{condition}'
 
-    if 'ewc' in checkpoint:
-        name += '-ewc'
+    if condition == 'sequential' and len(split) >= 8:
+        annotation = split[7].split('/')[0]
+        name += f'-{annotation}'
 
     if condition == 'interleaved':
         if len(split) > 6 and split[6] in {'2', '2/checkpoint'}:
