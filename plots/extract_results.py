@@ -56,7 +56,7 @@ def create_name(checkpoint, do_checkpoints=False):
     condition = split[3]
     name = f'{config}-{condition}'
 
-    if condition == 'sequential' and len(split) >= 8:
+    if condition == 'sequential' and len(split) - int(do_checkpoints) == 8:
         annotation = split[7].split('/')[0]
         name += f'-{annotation}'
 
