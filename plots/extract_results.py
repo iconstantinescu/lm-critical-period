@@ -20,7 +20,7 @@ def get_files(eval_type, model_type, l1, l2, checkpoints_dirname, do_checkpoints
                     if fnmatch.fnmatch(name, pattern):
                         matched_files.append(os.path.join(dir_path, name))
     else:
-        pattern = f'evaluate_{eval_type}_{model_type}-*-{l1}{l2}*.out'
+        pattern = f'evaluate_{eval_type}_{model_type}-*-{l1}{l2}-*.out'
         for name in os.listdir(path):
             if fnmatch.fnmatch(name, pattern):
                 matched_files.append(os.path.join(path, name))
