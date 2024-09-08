@@ -1,0 +1,12 @@
+task,c1-sequential-de,c1-sequential-fi
+cola,73.01,73.01
+sst2,88.58,87.2
+mrpc,66.67,70.62
+qqp,87.49,86.76
+mnli,76.99,75.66
+mnli-mm,77.61,76.58
+qnli,84.56,83.29
+rte,49.49,52.53
+boolq,62.93,64.59
+multirc,62.1,62.32
+wsc,61.45,61.45

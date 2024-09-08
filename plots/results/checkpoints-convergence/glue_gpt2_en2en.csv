@@ -1,0 +1,12 @@
+task,c4-sequential
+boolq,61.55
+cola,75.66
+mnli,76.96
+mnli-mm,77.93
+mrpc,70.06
+multirc,54.87
+qnli,82.37
+qqp,85.85
+rte,53.54
+sst2,90.55
+wsc,55.42

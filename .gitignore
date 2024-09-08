@@ -130,7 +130,7 @@ dmypy.json
 
 # Project specific
 data/
-checkpoints/
+/checkpoints*/
 logs/
 plots/*.csv
 wandb/
