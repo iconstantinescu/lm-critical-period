@@ -4,7 +4,20 @@ import fnmatch
 import os
 import json
 
-glue_tasks = ["cola", "sst2", "mrpc", "qqp", "mnli", "mnli-mm", "qnli", "rte", "boolq", "multirc", "wsc"]
+
+glue_tasks_metric = {
+    "cola": "mcc",
+    "sst2": "accuracy",
+    "mrpc": "f1",
+    "qqp": "f1",
+    "mnli": "accuracy",
+    "mnli-mm": "accuracy",
+    "qnli": "accuracy",
+    "rte": "accuracy",
+    "boolq": "accuracy",
+    "multirc": "f1",
+    "wsc": "accuracy",
+}
 
 
 def get_files(eval_type, model_type, l1, l2, checkpoints_dirname, do_checkpoints):
@@ -119,13 +132,13 @@ def extract_glue_results(files, model_type, l1, l2, checkpoints_dirname):
 
         results_dict[name] = {}
 
-        for task in glue_tasks:
+        for task, metric in glue_tasks_metric.items():
             result_file = os.path.join(checkpoint_dir, f'{task}/eval_results.json')
 
             try:
                 f = open(result_file)
                 data = json.load(f)
-                results_dict[name][task] = round(data['eval_accuracy'] * 100, 2)
+                results_dict[name][task] = round(data[f'eval_{metric}'] * 100, 2)
             except FileNotFoundError:
                 results_dict[name][task] = None
 
